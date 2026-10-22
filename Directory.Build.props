@@ -1,0 +1,54 @@
+<Project>
+  <PropertyGroup>
+    <ModVersion>1.0.0</ModVersion>
+    <ModGuid>com.manimal.scourge</ModGuid>
+    <ModAuthor>Manimal</ModAuthor>
+    <ModName>Scourge</ModName>
+    <ModClientName>$(ModAuthor)-$(ModName)</ModClientName>
+    <!-- Set only when this project's source is actually published. -->
+    <ModSourceUrl></ModSourceUrl>
+    <ModCodeLicense>MIT</ModCodeLicense>
+    <ModDataLicense>CC-BY-NC-SA-4.0</ModDataLicense>
+    <SupportedSptRange>&gt;=4.1.6 &lt;4.2.0</SupportedSptRange>
+    <UpstreamSourceUrl>https://github.com/SP-Tushonka/server-csharp</UpstreamSourceUrl>
+    <UpstreamCommit>c775c3bbe39dd8862ba7baf5b7fcd5003fbdaee4</UpstreamCommit>
+    <MoreBotsGuid>com.morebotsapi.tacticaltoaster</MoreBotsGuid>
+    <MoreBotsVersion>2.1.1</MoreBotsVersion>
+    <WttGuid>com.wtt.contentbackport</WttGuid>
+    <WttVersion>2.0.5</WttVersion>
+    <BigBrainGuid>xyz.drakia.bigbrain</BigBrainGuid>
+    <BigBrainVersion>1.5.0</BigBrainVersion>
+    <UnityToolkitGuid>com.arys.unitytoolkit</UnityToolkitGuid>
+    <SainGuid>me.sol.sain</SainGuid>
+    <SPTPath Condition="'$(SPTPath)' == ''">D:\SPT41Dev</SPTPath>
+    <ServerPath>$(SPTPath)\SPT_Runtime</ServerPath>
+    <GameManaged>$(SPTPath)\EscapeFromTarkov_Data\Managed</GameManaged>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NuGetAudit>false</NuGetAudit>
+    <RestoreConfigFile>$(MSBuildThisFileDirectory)NuGet.Config</RestoreConfigFile>
+    <Authors>$(ModAuthor)</Authors>
+    <Product>$(ModName)</Product>
+    <Version>$(ModVersion)</Version>
+    <AssemblyVersion>$(ModVersion).0</AssemblyVersion>
+    <FileVersion>$(ModVersion).0</FileVersion>
+    <RepositoryUrl>$(ModSourceUrl)</RepositoryUrl>
+    <PackageLicenseExpression>$(ModCodeLicense) AND $(ModDataLicense)</PackageLicenseExpression>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="ModGuid" Value="$(ModGuid)" />
+    <AssemblyMetadata Include="SourceUrl" Value="$(ModSourceUrl)" />
+    <AssemblyMetadata Include="CodeLicense" Value="$(ModCodeLicense)" />
+    <AssemblyMetadata Include="DataLicense" Value="$(ModDataLicense)" />
+    <AssemblyMetadata Include="UpstreamSource" Value="$(UpstreamSourceUrl)/tree/$(UpstreamCommit)" />
+    <AssemblyMetadata Include="DataAttribution" Value="Adapted from SP-Tushonka (Archangel) and SPT. CC BY-NC-SA 4.0. https://creativecommons.org/licenses/by-nc-sa/4.0/" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Keep license notices in runtime DLLs without adding documentation files to install archives. -->
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)LICENSE" LogicalName="$(ModGuid).LICENSE.MIT.txt" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)data/LICENSE" LogicalName="$(ModGuid).LICENSE.DATA.txt" />
+  </ItemGroup>
+</Project>

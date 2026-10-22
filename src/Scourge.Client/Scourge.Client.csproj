@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Manimal.Scourge.Client</AssemblyName>
+    <RootNamespace>Manimal.Scourge.Client</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ModDeployKind>client</ModDeployKind>
+    <Version>$(ModVersion)</Version>
+    <AssemblyVersion>$(ModVersion).0</AssemblyVersion>
+    <FileVersion>$(ModVersion).0</FileVersion>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\ScourgeRoles.cs" Link="Shared\ScourgeRoles.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>$(SPTPath)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(SPTPath)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="spt-reflection">
+      <HintPath>$(SPTPath)\BepInEx\plugins\spt\spt-reflection.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="DrakiaXYZ-BigBrain">
+      <HintPath>$(SPTPath)\BepInEx\plugins\DrakiaXYZ-BigBrain.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameManaged)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(GameManaged)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameManaged)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>$(GameManaged)\UnityEngine.AIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(GameManaged)\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ZLinq">
+      <HintPath>$(SPTPath)\BepInEx\plugins\UnityToolkit\ZLinq.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="ValidateClientReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\core\BepInEx.dll')"
+           Text="BepInEx was not found in the configured SPT install." />
+    <Error Condition="!Exists('$(GameManaged)\Assembly-CSharp.dll')"
+           Text="Assembly-CSharp was not found in the configured SPT install." />
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\core\0Harmony.dll')"
+           Text="0Harmony was not found in the configured SPT install." />
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\plugins\spt\spt-reflection.dll')"
+           Text="spt-reflection was not found in the configured SPT install." />
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\plugins\DrakiaXYZ-BigBrain.dll')"
+           Text="BigBrain was not found in the configured SPT install." />
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\plugins\UnityToolkit\ZLinq.dll')"
+           Text="UnityToolkit ZLinq was not found in the configured SPT install." />
+  </Target>
+</Project>

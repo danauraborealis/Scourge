@@ -1,0 +1,7 @@
+{
+  "Enabled": true,
+  "SpawnChance": 60,
+  "EscortCount": 4,
+  "SpawnZones": "BotZoneFloor1,BotZoneFloor2",
+  "SpawnTime": -1
+}

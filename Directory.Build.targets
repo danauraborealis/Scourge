@@ -1,0 +1,31 @@
+<Project>
+  <Target Name="GenerateModIdentity" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <IdentityFile>$(IntermediateOutputPath)ModIdentity.g.cs</IdentityFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <IdentityLine Include="// Generated from root Directory.Build.props." />
+      <IdentityLine Include="namespace Manimal.Scourge%3B" />
+      <IdentityLine Include="internal static class ModIdentity {" />
+      <IdentityLine Include="public const string Guid = &quot;$(ModGuid)&quot;%3B" />
+      <IdentityLine Include="public const string Author = &quot;$(ModAuthor)&quot;%3B" />
+      <IdentityLine Include="public const string Name = &quot;$(ModName)&quot;%3B" />
+      <IdentityLine Include="public const string ClientName = &quot;$(ModClientName)&quot;%3B" />
+      <IdentityLine Include="public const string Version = &quot;$(ModVersion)&quot;%3B" />
+      <IdentityLine Include="public const string SptRange = &quot;$(SupportedSptRange)&quot;%3B" />
+      <IdentityLine Include="public const string SourceUrl = &quot;$(ModSourceUrl)&quot;%3B" />
+      <IdentityLine Include="public const string License = &quot;$(PackageLicenseExpression)&quot;%3B" />
+      <IdentityLine Include="public const string MoreBotsGuid = &quot;$(MoreBotsGuid)&quot;%3B" />
+      <IdentityLine Include="public const string MoreBotsVersion = &quot;$(MoreBotsVersion)&quot;%3B" />
+      <IdentityLine Include="public const string WttGuid = &quot;$(WttGuid)&quot;%3B" />
+      <IdentityLine Include="public const string WttVersion = &quot;$(WttVersion)&quot;%3B" />
+      <IdentityLine Include="public const string BigBrainGuid = &quot;$(BigBrainGuid)&quot;%3B" />
+      <IdentityLine Include="public const string BigBrainVersion = &quot;$(BigBrainVersion)&quot;%3B" />
+      <IdentityLine Include="public const string UnityToolkitGuid = &quot;$(UnityToolkitGuid)&quot;%3B" />
+      <IdentityLine Include="public const string SainGuid = &quot;$(SainGuid)&quot;%3B" />
+      <IdentityLine Include="}" />
+      <Compile Include="$(IdentityFile)" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IdentityFile)" Lines="@(IdentityLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+</Project>

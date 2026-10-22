@@ -1,0 +1,11 @@
+.upstream/
+.tmp*
+.appdata/
+.test-runtime/
+.dotnet-home/
+**/bin/
+**/obj/
+dist/
+artifacts/
+/tests/
+/tools/

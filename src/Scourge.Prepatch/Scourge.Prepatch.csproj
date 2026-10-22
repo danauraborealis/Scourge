@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Manimal.Scourge.Prepatch</AssemblyName>
+    <RootNamespace>Manimal.Scourge.Prepatch</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ModDeployKind>prepatch</ModDeployKind>
+    <Version>$(ModVersion)</Version>
+    <AssemblyVersion>$(ModVersion).0</AssemblyVersion>
+    <FileVersion>$(ModVersion).0</FileVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\ScourgeRoles.cs" Link="Shared\ScourgeRoles.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>$(SPTPath)\BepInEx\core\Mono.Cecil.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="MoreBotsPrepatch">
+      <HintPath>$(SPTPath)\BepInEx\patchers\MoreBotsPrepatch\MoreBotsPrepatch.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="ValidatePrepatchReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\core\Mono.Cecil.dll')"
+           Text="Mono.Cecil was not found in the configured SPT install." />
+    <Error Condition="!Exists('$(SPTPath)\BepInEx\patchers\MoreBotsPrepatch\MoreBotsPrepatch.dll')"
+           Text="MoreBotsPrepatch was not found. Install MoreBotsAPI 2.1.1 before building Scourge." />
+  </Target>
+</Project>

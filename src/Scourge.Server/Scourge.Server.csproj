@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Manimal.Scourge.Server</AssemblyName>
+    <RootNamespace>Manimal.Scourge.Server</RootNamespace>
+    <OutputType>Library</OutputType>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <ModDeployKind>server</ModDeployKind>
+    <Version>$(ModVersion)</Version>
+    <AssemblyVersion>$(ModVersion).0</AssemblyVersion>
+    <FileVersion>$(ModVersion).0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="SPTarkov.Reflection" HintPath="$(ServerPath)\SPTarkov.Reflection.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(ServerPath)\0Harmony.dll" Private="false" />
+    <Compile Include="../Shared/ScourgeRoles.cs" Link="Shared/ScourgeRoles.cs" />
+    <None Include="..\..\data\db\**\*">
+      <Link>db\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\data\config.json" Link="config.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SPTarkov.Server.Core">
+      <HintPath>$(ServerPath)\SPTarkov.Server.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SPTarkov.DI">
+      <HintPath>$(ServerPath)\SPTarkov.DI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SPTarkov.Common">
+      <HintPath>$(ServerPath)\SPTarkov.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SemanticVersioning">
+      <HintPath>$(ServerPath)\SemanticVersioning.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>$(ServerPath)\JetBrains.Annotations.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="MoreBotsServer">
+      <HintPath>$(ServerPath)\user\mods\MoreBotsServer\MoreBotsServer.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
