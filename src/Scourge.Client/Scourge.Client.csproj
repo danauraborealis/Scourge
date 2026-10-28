@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Compile Include="..\Shared\ScourgeRoles.cs" Link="Shared\ScourgeRoles.cs" />
+    <Compile Include="..\Shared\ScourgeVoice.cs" Link="Shared\ScourgeVoice.cs" />
   </ItemGroup>
 
   <ItemGroup>

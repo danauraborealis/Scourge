@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <ModVersion>1.0.0</ModVersion>
+    <ModVersion>1.0.1</ModVersion>
     <ModGuid>com.manimal.scourge</ModGuid>
     <ModAuthor>Manimal</ModAuthor>
     <ModName>Scourge</ModName>

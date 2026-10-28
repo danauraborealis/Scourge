@@ -21,6 +21,24 @@ public sealed class ScourgeClientPlugin : BaseUnityPlugin
         LogSource = Logger;
         ScourgeAiConfig.Bind(Config);
 
+        // This static dictionary is initialized on first access. Register before
+        // any bot requests its voice; SPT supplies the bundle through bundles.json.
+        // Keep an existing mapping if another content mod already supplies it.
+        if (!InGameBundles._phrasesPaths.ContainsKey(ScourgeVoice.Name))
+        {
+            InGameBundles._phrasesPaths.Add(ScourgeVoice.Name, ScourgeVoice.BundlePath);
+        }
+
+        try
+        {
+            // Quest world markers do not depend on custom roles or AI tactics.
+            ScourgeQuestZonePatch.Enable();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError($"[Scourge] quest world markers could not initialize: {exception}");
+        }
+
         if (!TryGetPatchedRole(ScourgeRoles.Boss, ScourgeRoles.BossValue, out var boss)
             || !TryGetPatchedRole(ScourgeRoles.Follower, ScourgeRoles.FollowerValue, out var follower))
         {

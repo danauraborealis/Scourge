@@ -1,0 +1,2161 @@
+{
+    "laboratory":  [
+                       {
+                           "locationId":  "(-167,97823, 1,01725, -359,4274)",
+                           "probability":  1,
+                           "template":  {
+                                            "Id":  "item_flash_card_slider_ref [6c89e5ab-8a8c-40c2-b373-9920abe5227a]",
+                                            "IsContainer":  false,
+                                            "useGravity":  false,
+                                            "randomRotation":  false,
+                                            "Position":  {
+                                                             "x":  -167.97823,
+                                                             "y":  1.01725,
+                                                             "z":  -359.4274
+                                                         },
+                                            "Rotation":  {
+                                                             "x":  270,
+                                                             "y":  69.69386,
+                                                             "z":  0
+                                                         },
+                                            "IsAlwaysSpawn":  false,
+                                            "IsGroupPosition":  false,
+                                            "GroupPositions":  [
+
+                                                               ],
+                                            "Root":  "6ac8adf401bfabc4562617e7",
+                                            "Items":  [
+                                                          {
+                                                              "_id":  "6ac8adf401bfabc4562617e7",
+                                                              "_tpl":  "6a919148d1f99fb50b0f3113",
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          }
+                                                      ]
+                                        }
+                       },
+                       {
+                           "locationId":  "(-234,081192, 0,9903031, -361,636)",
+                           "probability":  0.5,
+                           "template":  {
+                                            "Id":  "item_container_event_scourge_suitcase [a0cb9f37-751c-4f4e-bf18-054bb3aee6e0]",
+                                            "IsContainer":  false,
+                                            "useGravity":  false,
+                                            "randomRotation":  false,
+                                            "Position":  {
+                                                             "x":  -234.081192,
+                                                             "y":  0.9903031,
+                                                             "z":  -361.636
+                                                         },
+                                            "Rotation":  {
+                                                             "x":  79.0481,
+                                                             "y":  0.00152792584,
+                                                             "z":  252.00351
+                                                         },
+                                            "IsAlwaysSpawn":  false,
+                                            "IsGroupPosition":  false,
+                                            "GroupPositions":  [
+
+                                                               ],
+                                            "Root":  "6ad327e367ef46c5dd111b57",
+                                            "Items":  [
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b57",
+                                                              "_tpl":  "6ac4e0e576842fabb501d5d0",
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b59",
+                                                              "_tpl":  "6ac4d528d8aa0d51df01995c",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  0,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b5b",
+                                                              "_tpl":  "5783c43d2459774bbe137486",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  1,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b5d",
+                                                              "_tpl":  "59e361e886f774176c10a2a5",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  2,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b5f",
+                                                              "_tpl":  "5c10c8fd86f7743d7d706df3",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  3,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b61",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  4,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b63",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  5,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  41
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b65",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  6,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  82
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b67",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  7,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  60
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b69",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  8,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  63
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b6b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  9,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  63
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b6d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  10,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b6f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  11,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b71",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  12,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  65
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b73",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  13,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b75",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  14,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b77",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  15,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  72
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b79",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  16,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  88
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b7b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  17,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  36
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b7d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  18,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  83
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b7f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  19,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  64
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b81",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  20,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  59
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b83",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  21,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  86
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b85",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  22,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b87",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  23,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  53
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b89",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  24,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  89
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b8b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  25,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  74
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b8d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  26,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  62
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b8f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  27,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  67
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b91",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  28,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  85
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b93",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  29,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  83
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b95",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  30,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  57
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b97",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  31,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  36
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b99",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  32,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  79
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b9b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  33,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  54
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b9d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  34,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  49
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b9f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  35,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba1",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  36,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  74
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba3",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  37,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  59
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba5",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  38,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  78
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba7",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  39,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  43
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba9",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  40,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  51
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bab",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  41,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  82
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bad",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  42,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  39
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111baf",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  43,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  60
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb1",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  44,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  73
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb3",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  45,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  45
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb5",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  46,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  85
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb7",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  47,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  68
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb9",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  48,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  72
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bbb",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  49,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  51
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bbd",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  50,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  70
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bbf",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  51,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  78
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc1",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  52,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  69
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc3",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  53,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  67
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc5",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  54,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc7",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  55,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  50
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc9",
+                                                              "_tpl":  "573475fb24597737fb1379e1",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  56,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bcb",
+                                                              "_tpl":  "590c392f86f77444754deb29",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  57,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          }
+                                                      ]
+                                        }
+                       },
+                       {
+                           "locationId":  "(-232,175888, 0,863003, -326,0666)",
+                           "probability":  0.5,
+                           "template":  {
+                                            "Id":  "item_container_event_scourge_suitcase [a0cb9f37-751c-4f4e-bf18-054bb3aee6e0]",
+                                            "IsContainer":  false,
+                                            "useGravity":  false,
+                                            "randomRotation":  false,
+                                            "Position":  {
+                                                             "x":  -232.175888,
+                                                             "y":  0.863003,
+                                                             "z":  -326.0666
+                                                         },
+                                            "Rotation":  {
+                                                             "x":  0,
+                                                             "y":  0,
+                                                             "z":  0
+                                                         },
+                                            "IsAlwaysSpawn":  false,
+                                            "IsGroupPosition":  false,
+                                            "GroupPositions":  [
+
+                                                               ],
+                                            "Root":  "6ad327e367ef46c5dd111b57",
+                                            "Items":  [
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b57",
+                                                              "_tpl":  "6ac4e0e576842fabb501d5d0",
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b59",
+                                                              "_tpl":  "6ac4d528d8aa0d51df01995c",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  0,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b5b",
+                                                              "_tpl":  "5783c43d2459774bbe137486",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  1,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b5d",
+                                                              "_tpl":  "59e361e886f774176c10a2a5",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  2,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b5f",
+                                                              "_tpl":  "5c10c8fd86f7743d7d706df3",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  3,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b61",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  4,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b63",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  5,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  41
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b65",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  6,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  82
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b67",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  7,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  60
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b69",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  8,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  63
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b6b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  9,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  63
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b6d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  10,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b6f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  11,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b71",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  12,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  65
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b73",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  13,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b75",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  14,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b77",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  15,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  72
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b79",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  16,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  88
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b7b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  17,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  36
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b7d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  18,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  83
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b7f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  19,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  64
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b81",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  20,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  59
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b83",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  21,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  86
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b85",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  22,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  40
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b87",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  23,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  53
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b89",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  24,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  89
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b8b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  25,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  74
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b8d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  26,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  62
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b8f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  27,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  67
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b91",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  28,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  85
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b93",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  29,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  83
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b95",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  30,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  57
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b97",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  31,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  36
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b99",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  32,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  79
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b9b",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  33,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  54
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b9d",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  34,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  49
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111b9f",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  35,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba1",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  36,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  74
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba3",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  37,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  59
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba5",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  38,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  78
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba7",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  39,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  43
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111ba9",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  40,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  51
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bab",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  41,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  82
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bad",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  42,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  39
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111baf",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  43,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  60
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb1",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  44,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  73
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb3",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  45,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  45
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb5",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  46,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  85
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb7",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  47,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  68
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bb9",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  48,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  72
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bbb",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  49,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  51
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bbd",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  50,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  70
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bbf",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  51,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  78
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc1",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  52,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  69
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc3",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  53,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  67
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc5",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  54,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  58
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc7",
+                                                              "_tpl":  "569668774bdc2da2298b4568",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  55,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "StackObjectsCount":  50
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bc9",
+                                                              "_tpl":  "573475fb24597737fb1379e1",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  56,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          },
+                                                          {
+                                                              "_id":  "6ad327e367ef46c5dd111bcb",
+                                                              "_tpl":  "590c392f86f77444754deb29",
+                                                              "parentId":  "6ad327e367ef46c5dd111b57",
+                                                              "slotId":  "main",
+                                                              "location":  {
+                                                                               "x":  57,
+                                                                               "y":  0,
+                                                                               "r":  0
+                                                                           },
+                                                              "upd":  {
+                                                                          "SpawnedInSession":  true,
+                                                                          "StackObjectsCount":  1
+                                                                      }
+                                                          }
+                                                      ]
+                                        }
+                       }
+                   ],
+    "sandbox":  [
+                    {
+                        "locationId":  "(-4,6057, 30,1292, 67,7889)",
+                        "probability":  1,
+                        "template":  {
+                                         "Id":  "item_quest_hdd_ssd_scourge [769f0520-95c6-4fbe-8773-21f8a8f78c6e]",
+                                         "IsContainer":  false,
+                                         "useGravity":  false,
+                                         "randomRotation":  false,
+                                         "Position":  {
+                                                          "x":  -4.6057,
+                                                          "y":  30.1292,
+                                                          "z":  67.7889
+                                                      },
+                                         "Rotation":  {
+                                                          "x":  0.0,
+                                                          "y":  344.959351,
+                                                          "z":  0.0
+                                                      },
+                                         "IsAlwaysSpawn":  false,
+                                         "IsGroupPosition":  false,
+                                         "GroupPositions":  [
+
+                                                            ],
+                                         "Root":  "6ad327d3c1d344f0e422a4fe",
+                                         "Items":  [
+                                                       {
+                                                           "_id":  "6ad327d3c1d344f0e422a4fe",
+                                                           "_tpl":  "6ac64a82d614fb7b2f0516a1",
+                                                           "upd":  {
+                                                                       "StackObjectsCount":  1
+                                                                   }
+                                                       }
+                                                   ]
+                                     }
+                    }
+                ],
+    "sandbox_high":  [
+                         {
+                             "locationId":  "(-4,6057, 30,1292, 67,7889)",
+                             "probability":  1,
+                             "template":  {
+                                              "Id":  "item_quest_hdd_ssd_scourge [769f0520-95c6-4fbe-8773-21f8a8f78c6e]",
+                                              "IsContainer":  false,
+                                              "useGravity":  false,
+                                              "randomRotation":  false,
+                                              "Position":  {
+                                                               "x":  -4.6057,
+                                                               "y":  30.1292,
+                                                               "z":  67.7889
+                                                           },
+                                              "Rotation":  {
+                                                               "x":  0.0,
+                                                               "y":  344.959351,
+                                                               "z":  0.0
+                                                           },
+                                              "IsAlwaysSpawn":  false,
+                                              "IsGroupPosition":  false,
+                                              "GroupPositions":  [
+
+                                                                 ],
+                                              "Root":  "6ad327d3c1d344f0e422a4fe",
+                                              "Items":  [
+                                                            {
+                                                                "_id":  "6ad327d3c1d344f0e422a4fe",
+                                                                "_tpl":  "6ac64a82d614fb7b2f0516a1",
+                                                                "upd":  {
+                                                                            "StackObjectsCount":  1
+                                                                        }
+                                                            }
+                                                        ]
+                                          }
+                         }
+                     ],
+    "tarkovstreets":  [
+                          {
+                              "locationId":  "(47,0272179, 1,439075, 113,294861)",
+                              "probability":  0.5,
+                              "template":  {
+                                               "Id":  "item_container_event_scourge_box [55863891-6522-4508-a5cd-d307db4ff370]",
+                                               "IsContainer":  false,
+                                               "useGravity":  false,
+                                               "randomRotation":  false,
+                                               "Position":  {
+                                                                "x":  47.0272179,
+                                                                "y":  1.439075,
+                                                                "z":  113.294861
+                                                            },
+                                               "Rotation":  {
+                                                                "x":  2.541952E-07,
+                                                                "y":  342.877625,
+                                                                "z":  0.0000016885208
+                                                            },
+                                               "IsAlwaysSpawn":  false,
+                                               "IsGroupPosition":  false,
+                                               "GroupPositions":  [
+
+                                                                  ],
+                                               "Root":  "6ad327d71ce937d55506f5d5",
+                                               "Items":  [
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5d5",
+                                                                 "_tpl":  "6ac4eccad8aa0d51df019974",
+                                                                 "upd":  {
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5d7",
+                                                                 "_tpl":  "5af0484c86f7740f02001f7f",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  0,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5d9",
+                                                                 "_tpl":  "5734773724597737fd047c14",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  1,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5db",
+                                                                 "_tpl":  "57347d7224597744596b4e72",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  2,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5dd",
+                                                                 "_tpl":  "57347d7224597744596b4e72",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  3,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5df",
+                                                                 "_tpl":  "5d40407c86f774318526545a",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  4,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e1",
+                                                                 "_tpl":  "57513f07245977207e26a311",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  5,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e3",
+                                                                 "_tpl":  "590c5d4b86f774784e1b9c45",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  6,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e5",
+                                                                 "_tpl":  "590c5d4b86f774784e1b9c45",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  7,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e7",
+                                                                 "_tpl":  "6ac4d528d8aa0d51df01995c",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  8,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             }
+                                                         ]
+                                           }
+                          },
+                          {
+                              "locationId":  "(47,4092674, 1,42807484, 102,692581)",
+                              "probability":  0.5,
+                              "template":  {
+                                               "Id":  "item_container_event_scourge_box [55863891-6522-4508-a5cd-d307db4ff370]",
+                                               "IsContainer":  false,
+                                               "useGravity":  false,
+                                               "randomRotation":  false,
+                                               "Position":  {
+                                                                "x":  47.4092674,
+                                                                "y":  1.42807484,
+                                                                "z":  102.692581
+                                                            },
+                                               "Rotation":  {
+                                                                "x":  0,
+                                                                "y":  147.81076,
+                                                                "z":  0
+                                                            },
+                                               "IsAlwaysSpawn":  false,
+                                               "IsGroupPosition":  false,
+                                               "GroupPositions":  [
+
+                                                                  ],
+                                               "Root":  "6ad327d71ce937d55506f5d5",
+                                               "Items":  [
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5d5",
+                                                                 "_tpl":  "6ac4eccad8aa0d51df019974",
+                                                                 "upd":  {
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5d7",
+                                                                 "_tpl":  "5af0484c86f7740f02001f7f",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  0,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5d9",
+                                                                 "_tpl":  "5734773724597737fd047c14",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  1,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5db",
+                                                                 "_tpl":  "57347d7224597744596b4e72",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  2,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5dd",
+                                                                 "_tpl":  "57347d7224597744596b4e72",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  3,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5df",
+                                                                 "_tpl":  "5d40407c86f774318526545a",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  4,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e1",
+                                                                 "_tpl":  "57513f07245977207e26a311",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  5,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e3",
+                                                                 "_tpl":  "590c5d4b86f774784e1b9c45",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  6,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e5",
+                                                                 "_tpl":  "590c5d4b86f774784e1b9c45",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  7,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             },
+                                                             {
+                                                                 "_id":  "6ad327d71ce937d55506f5e7",
+                                                                 "_tpl":  "6ac4d528d8aa0d51df01995c",
+                                                                 "parentId":  "6ad327d71ce937d55506f5d5",
+                                                                 "slotId":  "main",
+                                                                 "location":  {
+                                                                                  "x":  8,
+                                                                                  "y":  0,
+                                                                                  "r":  0
+                                                                              },
+                                                                 "upd":  {
+                                                                             "SpawnedInSession":  true,
+                                                                             "StackObjectsCount":  1
+                                                                         }
+                                                             }
+                                                         ]
+                                           }
+                          }
+                      ]
+}

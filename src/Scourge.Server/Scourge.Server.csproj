@@ -15,11 +15,21 @@
     <Reference Include="SPTarkov.Reflection" HintPath="$(ServerPath)\SPTarkov.Reflection.dll" Private="false" />
     <Reference Include="0Harmony" HintPath="$(ServerPath)\0Harmony.dll" Private="false" />
     <Compile Include="../Shared/ScourgeRoles.cs" Link="Shared/ScourgeRoles.cs" />
+    <Compile Include="../Shared/ScourgeVoice.cs" Link="Shared/ScourgeVoice.cs" />
     <None Include="..\..\data\db\**\*">
       <Link>db\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\data\config.json" Link="config.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\data\bundles.json" Link="bundles.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\data\bundles.json')" />
+    <None Include="..\..\data\bundles\**\*.bundle">
+      <Link>bundles\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\data\images\**\*">
+      <Link>images\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

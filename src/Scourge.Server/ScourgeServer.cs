@@ -19,14 +19,13 @@ public sealed class ScourgeServer(
     BotTable botTable,
     LocationTable locationTable,
     TemplateTable templateTable,
+    ScourgeContent scourgeContent,
     SeasonalEventConfig seasonalEventConfig,
     ISptLogger<ScourgeServer> logger) : IOnLoad
 {
     private static readonly MongoId MissingGasGrenade = new("69f07893e761ac1c200ae15b");
     private static readonly MongoId InstalledGasGrenade = new("6a5d6a5f4ed8c025a0a2cff0");
-    private static readonly MongoId ScourgeSmartphone = new("6ac4cfbc99bdd7779608792f");
-    private static readonly MongoId MissingScourgeVoice = new("6acf6e6e35ee26cb5b0a5ab1");
-    private static readonly MongoId FallbackVoice = new("646e46ca286188c5480a1a37");
+    private static readonly MongoId ScourgePrecursor = new("6ac4d528d8aa0d51df01995c");
     private ScourgeConfig? _config;
     private bool _bpsPatched;
 
@@ -35,11 +34,15 @@ public sealed class ScourgeServer(
         cancellationToken.ThrowIfCancellationRequested();
 
         var assembly = Assembly.GetExecutingAssembly();
+        scourgeContent.Load(assembly);
+        cancellationToken.ThrowIfCancellationRequested();
+
         await moreBotsApi.LoadBots(assembly);
         cancellationToken.ThrowIfCancellationRequested();
 
         EnsureBotTypesLoaded();
         AdaptBotData();
+        AdaptScourgeLoot();
         customBotTypeService.AddCustomWildSpawnTypeNames(new Dictionary<int, string>
         {
             // MoreBots uses this fallback directly as a BotTable key when the client enum
@@ -190,8 +193,35 @@ public sealed class ScourgeServer(
             }
         }
 
-        pool.Remove(ScourgeSmartphone);
         RemoveUnavailable(pool, templateTable.Items);
+    }
+
+    private void AdaptScourgeLoot()
+    {
+        AddPocketLoot(ScourgeRoles.Boss, 30);
+        AddPocketLoot(ScourgeRoles.Follower, 20);
+
+        var follower = botTable.Types[ScourgeRoles.Follower.ToLowerInvariant()]!;
+        var pocketLoot = follower.BotGeneration?.Items?.PocketLoot
+            ?? throw new InvalidOperationException("[Scourge] follower generation pocket loot is unavailable.");
+
+        // The upstream guard data uses a single {0:424} entry. Keep all other
+        // item-generation categories intact while giving the three pocket sizes
+        // explicit weights for the event precursor loot.
+        pocketLoot.Weights = new Dictionary<double, double>
+        {
+            [0] = 50,
+            [1] = 45,
+            [2] = 5,
+        };
+    }
+
+    private void AddPocketLoot(string role, double weight)
+    {
+        var bot = botTable.Types[role.ToLowerInvariant()]!;
+        var pockets = bot.BotInventory?.Items?.Pockets
+            ?? throw new InvalidOperationException($"[Scourge] bot role '{role}' has no pocket loot pool.");
+        pockets[ScourgePrecursor] = weight;
     }
 
     private void ValidateEquipment(BotTypeInventory inventory, string role)
@@ -268,23 +298,10 @@ public sealed class ScourgeServer(
             voices = bot.BotAppearance.Voice;
         }
 
-        if (!templateTable.Customization.ContainsKey(MissingScourgeVoice) && voices.Remove(MissingScourgeVoice, out var missingVoiceWeight))
-        {
-            if (templateTable.Customization.ContainsKey(FallbackVoice))
-            {
-                voices[FallbackVoice] = voices.TryGetValue(FallbackVoice, out var existing) ? existing + missingVoiceWeight : missingVoiceWeight;
-            }
-        }
-
         RemoveUnavailable(voices, templateTable.Customization);
         if (voices.Count == 0)
         {
-            if (!templateTable.Customization.ContainsKey(FallbackVoice))
-            {
-                throw new InvalidOperationException($"[Scourge] bot role '{role}' has no valid voice customization after adapting the missing Scourge voice.");
-            }
-
-            voices[FallbackVoice] = 1;
+            throw new InvalidOperationException($"[Scourge] bot role '{role}' has no valid voice customization.");
         }
     }
 
