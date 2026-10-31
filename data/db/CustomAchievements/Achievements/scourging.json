@@ -1,0 +1,40 @@
+[
+  {
+    "id": "6ad61d4b93495b6d53062150",
+    "imageUrl": "/files/achievement/scourging-6ad61d4b93495b6d53062150.png",
+    "assetPath": "",
+    "rewards": [],
+    "conditions": {
+      "availableForFinish": [
+        {
+          "id": "4e604780df273494b7922921",
+          "index": 0,
+          "dynamicLocale": false,
+          "visibilityConditions": [],
+          "globalQuestCounterId": "",
+          "parentId": "",
+          "value": 1,
+          "type": "Quest",
+          "conditionType": "Quest",
+          "target": "6ac4c42976842fabb501d5b8",
+          "status": [
+            4
+          ],
+          "availableAfter": 0,
+          "isNecessary": true
+        }
+      ],
+      "fail": []
+    },
+    "instantComplete": false,
+    "showNotificationsInGame": false,
+    "showProgress": false,
+    "prefab": "",
+    "rarity": "Legendary",
+    "hidden": false,
+    "showConditions": false,
+    "progressBarEnabled": false,
+    "side": "All",
+    "index": 10003
+  }
+]

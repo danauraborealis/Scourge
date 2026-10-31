@@ -57,5 +57,9 @@
       <HintPath>$(ServerPath)\user\mods\MoreBotsServer\MoreBotsServer.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="WTT-ServerCommonLib">
+      <HintPath>$(ServerPath)\user\mods\WTT-ServerCommonLib\WTT-ServerCommonLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 </Project>

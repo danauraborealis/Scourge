@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <ModVersion>1.0.1</ModVersion>
+    <ModVersion>1.0.3</ModVersion>
     <ModGuid>com.manimal.scourge</ModGuid>
     <ModAuthor>Manimal</ModAuthor>
     <ModName>Scourge</ModName>
@@ -16,6 +16,8 @@
     <MoreBotsVersion>2.1.1</MoreBotsVersion>
     <WttGuid>com.wtt.contentbackport</WttGuid>
     <WttVersion>2.0.5</WttVersion>
+    <CommonLibGuid>com.wtt.commonlib</CommonLibGuid>
+    <CommonLibVersion>3.0.6</CommonLibVersion>
     <BigBrainGuid>xyz.drakia.bigbrain</BigBrainGuid>
     <BigBrainVersion>1.5.0</BigBrainVersion>
     <UnityToolkitGuid>com.arys.unitytoolkit</UnityToolkitGuid>

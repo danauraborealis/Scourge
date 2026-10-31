@@ -19,6 +19,8 @@
       <IdentityLine Include="public const string MoreBotsVersion = &quot;$(MoreBotsVersion)&quot;%3B" />
       <IdentityLine Include="public const string WttGuid = &quot;$(WttGuid)&quot;%3B" />
       <IdentityLine Include="public const string WttVersion = &quot;$(WttVersion)&quot;%3B" />
+      <IdentityLine Include="public const string CommonLibGuid = &quot;$(CommonLibGuid)&quot;%3B" />
+      <IdentityLine Include="public const string CommonLibVersion = &quot;$(CommonLibVersion)&quot;%3B" />
       <IdentityLine Include="public const string BigBrainGuid = &quot;$(BigBrainGuid)&quot;%3B" />
       <IdentityLine Include="public const string BigBrainVersion = &quot;$(BigBrainVersion)&quot;%3B" />
       <IdentityLine Include="public const string UnityToolkitGuid = &quot;$(UnityToolkitGuid)&quot;%3B" />

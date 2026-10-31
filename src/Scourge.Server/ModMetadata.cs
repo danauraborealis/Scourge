@@ -21,6 +21,7 @@ public sealed record ModMetadata : IModMetadata
     {
         [ModIdentity.MoreBotsGuid] = new($"~{ModIdentity.MoreBotsVersion}"),
         [ModIdentity.WttGuid] = new($"~{ModIdentity.WttVersion}"),
+        [ModIdentity.CommonLibGuid] = new($"^{ModIdentity.CommonLibVersion}"),
     };
     public string? Url { get; init; } = string.IsNullOrEmpty(ModIdentity.SourceUrl) ? null : ModIdentity.SourceUrl;
     public string License { get; init; } = ModIdentity.License;
