@@ -1,5 +1,7 @@
 using System.Reflection;
 using MoreBotsServer;
+using MoreBotsServer.Interop;
+using MoreBotsServer.Models;
 using MoreBotsServer.Services;
 using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
@@ -16,11 +18,14 @@ namespace Manimal.Scourge.Server;
 public sealed class ScourgeServer(
     MoreBotsAPI moreBotsApi,
     MoreBotsCustomBotTypeService customBotTypeService,
+    SainInteropRegistration sainInterop,
+    ScourgeSainDefaults sainDefaults,
     BotTable botTable,
     LocationTable locationTable,
     TemplateTable templateTable,
     ScourgeContent scourgeContent,
     SeasonalEventConfig seasonalEventConfig,
+    ScourgeInfectedLabsGas infectedLabsGas,
     ISptLogger<ScourgeServer> logger) : IOnLoad
 {
     private static readonly MongoId MissingGasGrenade = new("69f07893e761ac1c200ae15b");
@@ -37,6 +42,8 @@ public sealed class ScourgeServer(
         scourgeContent.Load(assembly);
         cancellationToken.ThrowIfCancellationRequested();
 
+        sainDefaults.EnableIfAvailable();
+
         await moreBotsApi.LoadBots(assembly);
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -51,6 +58,8 @@ public sealed class ScourgeServer(
             [ScourgeRoles.FollowerValue] = ScourgeRoles.Follower.ToLowerInvariant(),
         });
         RegisterEventBotMappings();
+        RegisterSainBot(ScourgeRoles.BossValue, ScourgeRoles.Boss, isBoss: true);
+        RegisterSainBot(ScourgeRoles.FollowerValue, ScourgeRoles.Follower, isBoss: false);
 
         var config = _config = ScourgeConfig.Load(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(assembly.Location)!, "config.json"));
         if (!config.Enabled)
@@ -61,7 +70,27 @@ public sealed class ScourgeServer(
 
         EnsureLabsWave();
         EnableBpsCompatibility();
+        infectedLabsGas.EnableIfAvailable();
         logger.Info($"[Scourge] registered {ScourgeRoles.Boss} on Labs ({config.SpawnChance:0}% chance, {config.EscortCount} escorts, zones: {string.Join(',', config.SpawnZones)})");
+    }
+
+    private void RegisterSainBot(int role, string databaseKey, bool isBoss)
+    {
+        // MoreBots forwards this to SAIN's optional server registry after
+        // startup. SAIN uses this single registration for per-role settings,
+        // bot-editor entries, and client layers; no second prepatch registration.
+        sainInterop.RegisterBotType(new MoreBotsSainBotTypeRegistration
+        {
+            WildSpawnType = role,
+            BotDbKey = databaseKey.ToLowerInvariant(),
+            Name = isBoss ? ModIdentity.Name : ModIdentity.Name + " Guard",
+            Description = isBoss ? "Scourge Labs boss" : "Scourge's protective escort",
+            Section = ModIdentity.ClientName,
+            DifficultyModifier = 1f,
+            BaseBrain = "ArenaFighter",
+            BrainsToApply = ["ArenaFighter"],
+            LayersToRemove = ["FightReqNull", "PeacecReqNull"],
+        });
     }
 
     private void RegisterEventBotMappings()

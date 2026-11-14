@@ -53,6 +53,9 @@ namespace Manimal.Scourge.Client.AI
             : 0f;
         public Vector3 ProtectionCenter => ProtectionActive ? ProtectionBoss.Position : default(Vector3);
         public int ProtectionRevision => Squad?.ProtectionRevision ?? 0;
+        public bool ProtectionAnchorLocked => _protectionAnchorState.IsLocked;
+        public bool ProtectionAnchorTerminal => _protectionAnchorState.IsTerminal;
+        public string ProtectionAnchorId => _protectionAnchorState.AnchorId;
         public bool ProtectionRevisionChanged => Squad != null
             && Squad.ProtectionRevision != _observedProtectionRevision;
         public ScourgeProtectionSettings ProtectionSettings => ScourgeAiConfig.ProtectionSettings;
@@ -551,6 +554,66 @@ namespace Manimal.Scourge.Client.AI
                     + $"distance={distance:F1}, canFire={CanFire}, support={support?.ProfileId ?? "none"}, "
                     + $"visible={Visible}, attackSlot={attack}.");
             Tactic = next;
+        }
+
+        /// <summary>
+        /// Updates only the boss anchor and protection membership used by the
+        /// SAIN bridge. SAIN owns enemy selection, combat, aiming, reloads,
+        /// and movement in that mode, so running the full tactical refresh
+        /// here would allocate combat slots and inspect native combat state
+        /// for no reason.
+        /// </summary>
+        public void RefreshProtectionOnly()
+        {
+            var now = Time.time;
+            if (now < _nextRefresh)
+            {
+                // Death of the locked anchor is a terminal transition, not a
+                // normal refresh. Observe it immediately so a pending native
+                // Regroup cannot spend the throttle window following a stale
+                // boss or a replacement leader.
+                if (!_protectionAnchorState.IsLocked
+                    || _lockedProtectionBoss == null
+                    || !_lockedProtectionBoss.IsDead)
+                {
+                    return;
+                }
+
+                _nextRefresh = 0f;
+            }
+            _nextRefresh = now + 0.2f;
+
+            var boss = ResolveProtectionBoss();
+            object key = (object)boss ?? _bot;
+            if (!ReferenceEquals(key, _squadKey))
+            {
+                Release();
+                _squadKey = key;
+                Squad = Squads.GetValue(key, _ => new ScourgeSquadContext());
+                _observedProtectionRevision = Squad.ProtectionRevision;
+            }
+
+            if (boss != null)
+            {
+                var members = new List<BotOwner>();
+                if (_bot.BotsGroup?._members != null) members.AddRange(_bot.BotsGroup._members);
+                if (boss.BotsGroup != null) members.AddRange(boss.BotsGroup._members);
+                if (boss.Boss?.Followers != null) members.AddRange(boss.Boss.Followers);
+                members.Add(boss);
+                Members = members.AsValueEnumerable().Where(member => member != null && !member.IsDead
+                    && member.Profile?.Info?.Settings != null
+                    && (ReferenceEquals(member, boss)
+                        || (int)member.Profile.Info.Settings.Role == ScourgeRoles.FollowerValue)
+                    && !IsLockedToDifferentBoss(member, boss)
+                    && IsAssociatedWithBoss(member, boss))
+                    .Distinct().ToArray();
+            }
+            else
+            {
+                Members = new[] { _bot };
+            }
+
+            RefreshProtection(boss, now);
         }
     }
 }

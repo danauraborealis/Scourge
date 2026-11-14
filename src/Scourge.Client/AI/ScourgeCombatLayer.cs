@@ -12,7 +12,8 @@ namespace Manimal.Scourge.Client.AI
         public override string GetName() => "Scourge Squad Combat";
         public override bool IsActive()
         {
-            if (!ScourgeBotContext.Usable(BotOwner)) return false;
+            if (!ScourgeSainCompatibility.UseCustomController(BotOwner)
+                || !ScourgeBotContext.Usable(BotOwner)) return false;
             var context = ScourgeBotContext.Get(BotOwner);
             try
             {

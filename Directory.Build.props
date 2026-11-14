@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <ModVersion>1.0.3</ModVersion>
+    <ModVersion>1.0.4</ModVersion>
     <ModGuid>com.manimal.scourge</ModGuid>
     <ModAuthor>Manimal</ModAuthor>
     <ModName>Scourge</ModName>
@@ -15,7 +15,7 @@
     <MoreBotsGuid>com.morebotsapi.tacticaltoaster</MoreBotsGuid>
     <MoreBotsVersion>2.1.1</MoreBotsVersion>
     <WttGuid>com.wtt.contentbackport</WttGuid>
-    <WttVersion>2.0.5</WttVersion>
+    <WttVersion>2.0.7</WttVersion>
     <CommonLibGuid>com.wtt.commonlib</CommonLibGuid>
     <CommonLibVersion>3.0.6</CommonLibVersion>
     <BigBrainGuid>xyz.drakia.bigbrain</BigBrainGuid>

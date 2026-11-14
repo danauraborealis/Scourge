@@ -43,20 +43,15 @@ internal static class ScourgeAiRuntime
                 return false;
             }
 
+            ScourgeClientPlugin.LogSource.LogInfo(
+                ScourgeSainCompatibility.SainAvailable
+                    ? (ScourgeSainCompatibility.ProtectionBridgeReady
+                        ? "[Scourge] SAIN owns eligible combat; the native Scourge protection bridge is available."
+                        : "[Scourge] SAIN owns eligible combat; protection bridge unavailable, so no custom regroup overlay will run.")
+                    : "[Scourge] SAIN is absent; standalone Scourge combat and escort tactics are active.");
+
             RegisterLayers();
             Ready = true;
-
-            if (!ScourgeSainCompatibility.CompleteInitialization())
-            {
-                Ready = false;
-                if (string.IsNullOrEmpty(FailureReason))
-                {
-                    FailureReason = "SAIN layer restoration failed";
-                }
-                ScourgeClientPlugin.LogSource.LogError(
-                    "[Scourge] tactics disabled because SAIN layer restoration was not safe; existing AI configuration is retained.");
-                return false;
-            }
 
             FailureReason = string.Empty;
             return true;

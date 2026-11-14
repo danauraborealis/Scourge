@@ -66,6 +66,9 @@ public static class ScourgeWildSpawnTypePatch
         customType.SetCountAsBossForStatistics(isBoss);
         customType.SetShouldUseFenceNoBossAttack(shouldUseForScav: false, shouldUseForPMC: false);
         customType.SetExcludedDifficulties(AllowedDifficulties);
+        // SAIN 4.5 reads our brain/settings registration from its server registry.
+        // Setting SAINSettings here would make MoreBots install a second copy
+        // of every SAIN layer. ScourgeServer owns that optional registration.
         CustomWildSpawnTypeManager.RegisterWildSpawnType(customType, assembly);
     }
 }

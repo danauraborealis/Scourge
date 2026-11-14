@@ -1,1149 +1,880 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BepInEx.Bootstrap;
-using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using Manimal.Scourge;
-using Manimal.Scourge.Client;
 using SPT.Reflection.Patching;
+using UnityEngine;
 using ZLinq;
 
 namespace Manimal.Scourge.Client.AI;
 
+/// <summary>
+/// Keeps the custom Scourge controller as a fallback while allowing SAIN to
+/// own combat when its bot component is active. The compatibility layer only
+/// changes the one squad relationship that Scourge needs: followers regroup
+/// toward their living Scourge boss through SAIN's own mover and steering.
+/// </summary>
 internal static class ScourgeSainCompatibility
 {
     private const string SainBotSpawnControllerTypeName =
         "SAIN.Components.BotController.BotSpawnController";
-    private const string SainBrainAssignmentTypeName =
-        "SAIN.BigBrainHandler+BrainAssignment";
-    private const string SainBigBrainHandlerTypeName = "SAIN.BigBrainHandler";
-    private const string BigBrainHelpersTypeName = "DrakiaXYZ.BigBrain.Internal.BrainHelpers";
-    private const string SainLayerNamesPropertyName = "SAINLayerNames";
-    private const string CommonVanillaLayersFieldName = "_commonVanillaLayersToRemove";
-    private const string CommonVanillaBossAndFollowerLayersFieldName =
-        "_commonVanillaBossAndFollowerLayersToRemove";
-    private const string ArenaFighterBrainName = "ArenaFighter";
+    private const string SainEnableClassTypeName = "SAIN.SAINEnableClass";
+    private const string SainDecisionManagerTypeName =
+        "SAIN.SAINComponent.Classes.Decision.BotDecisionManager";
+    private const string SainSquadContainerTypeName =
+        "SAIN.SAINComponent.Classes.Info.BotSquadContainer";
 
-    // ArenaFighterLayersStrategy in the installed client (SPT 4.1.6) supplies
-    // these exact native layer names. The request layers include the exact
-    // no-request forms below and have state-dependent names; ReadNativeLayerNames
-    // adds those only when an existing exclusion contains a verified Name() form.
-    private static readonly string[] ArenaFighterNativeLayerNames =
-    {
-        "AvoidDanger",
-        "Malfunction",
-        "FightReqNull",
-        "Pmc",
-        "AssaultHaveEnemy",
-        "PeacecReqNull",
-        "AdvAssaultTarget",
-        "Utility peace",
-        "PatrolFollower",
-        "PatrolAssault"
-    };
+    private static readonly object Sync = new object();
+    private static readonly List<ModulePatch> Patches = new List<ModulePatch>();
+    private static readonly Dictionary<Type, PropertyInfo> OwnerProperties
+        = new Dictionary<Type, PropertyInfo>();
+    private static readonly Dictionary<Type, PropertyInfo> BotProperties
+        = new Dictionary<Type, PropertyInfo>();
+    private static readonly ConditionalWeakTable<BotOwner, RegroupState> RegroupStates
+        = new ConditionalWeakTable<BotOwner, RegroupState>();
 
-    private const string FightRequestLayerPrefix = "FiReq:";
-    private const string FightRequestLayerWithoutRequest = "FightReqNull";
-    private const string PeacefulRequestLayerPrefix = "PcReq:";
-    private const string PeacefulRequestLayerWithoutRequest = "PeacecReqNull";
+    private const float RegroupProgressSampleSeconds = 1f;
+    private const float RegroupMinimumProgress = 0.5f;
+    private const int RegroupStallSamplesBeforeRetry = 2;
+    private const float RegroupRetryCooldownSeconds = 2f;
+    private const float RegroupRetryBackoffSeconds = 4f;
+    private const int RegroupRetryLimit = 3;
 
-    private static readonly List<ModulePatch> PatchReferences = new List<ModulePatch>();
-    private static readonly List<ScourgeLayerMutation> AppliedMutations =
-        new List<ScourgeLayerMutation>();
-    private static PropertyInfo _sainLayerNamesProperty;
-    private static FieldInfo _commonVanillaLayersField;
-    private static FieldInfo _commonVanillaBossAndFollowerLayersField;
-    private static PropertyInfo _brainManagerInstanceProperty;
-    private static FieldInfo _activatedBotsField;
-    private static MethodInfo _restoreLayerForBotMethod;
     private static bool _initialized;
+    private static bool _sainInstalled;
+    private static bool _ownershipResolved;
+    private static bool _sainBridgeReady;
+    private static Assembly _sainAssembly;
+    private static PropertyInfo _botSpawnControllerInstance;
+    private static MethodInfo _getSainMethod;
+    private static MethodInfo _isSainDisabledForBotMethod;
+    private static MethodInfo _setDecisionsMethod;
+    private static MethodInfo _leaderComponentGetter;
+    private static Type _squadDecisionType;
+    private static int _combatNone;
+    private static int _combatSearch;
+    private static int _combatRushEnemy;
+    private static int _combatMoveToEngage;
+    private static int _combatCreepOnEnemy;
+    private static int _combatStandAndShoot;
+    private static int _combatShootDistantEnemy;
+    private static int _combatRetreat;
+    private static int _combatRunAway;
+    private static int _combatDogFight;
+    private static int _combatAvoidGrenade;
+    private static int _combatMeleeAttack;
+    private static int _selfNone;
+    private static int _squadNone;
+    private static int _squadRegroup;
+    private static int[] _knownSquadDecisions;
+    private static int _squadRetreat;
+    private static int _squadBoundingRetreat;
+
+    internal static bool SainAvailable => _sainInstalled;
+
+    internal static bool ProtectionBridgeReady => ProtectionBridgeAvailable;
+
+    private static bool ProtectionBridgeAvailable => _sainInstalled && _sainBridgeReady;
+
+    private static void LogDebug(string message)
+    {
+        if (ScourgeClientPlugin.LogSource != null)
+        {
+            ScourgeClientPlugin.LogSource.LogDebug(message);
+        }
+    }
+
+    private sealed class RegroupState
+    {
+        internal bool Active;
+        internal string AnchorId;
+        internal bool CloseGuard;
+        // Kept as simple fields for the runtime probe and for cheap state
+        // inspection; Progress mirrors these values for the pure policy API.
+        internal float LastSampleTime = float.NegativeInfinity;
+        internal float LastDistance;
+        internal bool HasSample;
+        internal int StallSamples;
+        internal ScourgeRegroupProgressState Progress
+            = ScourgeRegroupProgressState.Empty;
+        internal int RetryCount;
+        internal float RetryBlockedUntil = float.NegativeInfinity;
+
+        internal void Reset(string anchorId, bool closeGuard)
+        {
+            Active = false;
+            AnchorId = anchorId;
+            CloseGuard = closeGuard;
+            LastSampleTime = float.NegativeInfinity;
+            LastDistance = 0f;
+            HasSample = false;
+            StallSamples = 0;
+            Progress = ScourgeRegroupProgressState.Empty;
+            RetryCount = 0;
+            RetryBlockedUntil = float.NegativeInfinity;
+        }
+
+        internal void Stop()
+        {
+            Active = false;
+            LastSampleTime = float.NegativeInfinity;
+            LastDistance = 0f;
+            HasSample = false;
+            StallSamples = 0;
+            Progress = ScourgeRegroupProgressState.Empty;
+            RetryCount = 0;
+            RetryBlockedUntil = float.NegativeInfinity;
+        }
+    }
 
     internal static bool Initialize()
     {
-        if (_initialized)
+        lock (Sync)
         {
-            return true;
-        }
-
-        if (!Chainloader.PluginInfos.ContainsKey(ModIdentity.SainGuid))
-        {
-            _initialized = true;
-            return true;
-        }
-
-        try
-        {
-            var fallbackTargets = ResolveFallbackTargets();
-            _brainManagerInstanceProperty = fallbackTargets.BrainManagerInstanceProperty;
-            _activatedBotsField = fallbackTargets.ActivatedBotsField;
-            _restoreLayerForBotMethod = fallbackTargets.RestoreLayerForBotMethod;
-
-            var targets = ResolveTargets();
-            _sainLayerNamesProperty = targets.SainLayerNamesProperty;
-            _commonVanillaLayersField = targets.CommonVanillaLayersField;
-            _commonVanillaBossAndFollowerLayersField =
-                targets.CommonVanillaBossAndFollowerLayersField;
-
-            // Keep every constructed patch alive, including if a later Enable
-            // call fails. Ready stays false until custom layers are registered.
-            PatchReferences.Add(new SainBotSpawnExclusionPatch(targets.IsExcludedMethod));
-            PatchReferences.Add(new SainToggleVanillaLayersPatch(targets.ToggleVanillaLayersMethod));
-            PatchReferences.Add(new SainToggleVanillaLayersForRolesPatch(
-                targets.ToggleVanillaLayersForRolesMethod));
-
-            for (var index = 0; index < PatchReferences.Count; index++)
+            if (_initialized)
             {
-                PatchReferences[index].Enable();
+                return true;
             }
 
             _initialized = true;
-            return true;
-        }
-        catch (Exception exception)
-        {
-            ScourgeClientPlugin.LogSource.LogError(
-                $"[Scourge] SAIN compatibility could not initialize; existing AI configuration is retained: {exception}");
-            return false;
+            if (!Chainloader.PluginInfos.ContainsKey(ModIdentity.SainGuid))
+            {
+                ScourgeClientPlugin.LogSource.LogInfo(
+                    "[Scourge] SAIN is not installed; using the custom squad controller.");
+                return true;
+            }
+
+            try
+            {
+                ResolveSainTargets();
+                _sainInstalled = true;
+                _ownershipResolved = true;
+                Patches.Add(new SainDecisionPatch(_setDecisionsMethod));
+                Patches.Add(new SainLeaderPatch(_leaderComponentGetter));
+                for (var index = 0; index < Patches.Count; index++)
+                {
+                    Patches[index].Enable();
+                }
+
+                _sainBridgeReady = true;
+                ScourgeClientPlugin.LogSource.LogInfo(
+                    "[Scourge] SAIN integration enabled: SAIN owns combat and Scourge guards use SAIN regroup behavior.");
+                return true;
+            }
+            catch (Exception exception)
+            {
+                // If target resolution failed, the client must yield its custom
+                // layers to SAIN because ownership is unknown. If only the
+                // optional protection bridge failed, ownership still resolves
+                // and custom combat remains suppressed for SAIN bots.
+                _sainInstalled = true;
+                _sainBridgeReady = false;
+                ScourgeClientPlugin.LogSource.LogError(
+                    $"[Scourge] SAIN integration could not initialize its protection bridge; SAIN ownership is retained where resolvable: {exception}");
+                return true;
+            }
         }
     }
 
-    // Called after ScourgeAiRuntime marks its custom layers ready. This repairs
-    // exclusions created before the compatibility postfixes were active, but
-    // only for the two Scourge roles and the ArenaFighter brain.
-    internal static bool CompleteInitialization()
+    /// <summary>
+    /// The custom layers are active only when this bot is not currently owned
+    /// by SAIN. SAIN can be disabled for an individual role in its preset, so
+    /// this is deliberately per bot rather than a global plugin check.
+    /// </summary>
+    internal static bool UseCustomController(BotOwner bot)
     {
-        if (!_initialized)
-        {
-            return false;
-        }
-
-        if (!ScourgeAiRuntime.Ready || _sainLayerNamesProperty == null)
+        if (!SainAvailable || ReferenceEquals(bot, null))
         {
             return true;
+        }
+
+        if (!_ownershipResolved)
+        {
+            // SAIN is installed but its ownership API changed. Do not run a
+            // second movement/aiming controller on top of an unknown SAIN bot.
+            return false;
         }
 
         try
         {
-            RestoreExistingScourgeExclusions();
-            return true;
+            if (_isSainDisabledForBotMethod != null
+                && (bool)_isSainDisabledForBotMethod.Invoke(null, new object[] { bot }))
+            {
+                return true;
+            }
+
+            var component = GetSainComponent(bot);
+            if (component == null)
+            {
+                return true;
+            }
+
+            // SAINLayersActive is a scheduler state and is false while a bot
+            // is idle. The component's existence is the ownership signal.
+            return false;
         }
         catch (Exception exception)
         {
-            FailClosed(
-                "SAIN scoped layer repair was not safe to apply; custom tactics disabled and existing AI configuration retained",
-                exception);
-            ScourgeClientPlugin.LogSource.LogError(
-                $"[Scourge] SAIN compatibility cleanup failed: {exception}");
+            LogDebug(
+                $"[Scourge] SAIN ownership check failed for {bot.ProfileId}; yielding custom controller: {exception.Message}");
             return false;
         }
     }
 
-    private static SainTargets ResolveTargets()
+    internal static bool TryGetProtectionBoss(BotOwner bot, out BotOwner boss)
     {
-        var pluginInfo = Chainloader.PluginInfos[ModIdentity.SainGuid];
-        var sainAssembly = pluginInfo.Instance?.GetType().Assembly;
-        if (sainAssembly == null)
+        boss = null;
+        if (!ProtectionBridgeAvailable || ReferenceEquals(bot, null) || !ScourgeRoles.IsScourge(GetRole(bot)))
         {
-            sainAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                .AsValueEnumerable()
-                .FirstOrDefault(assembly =>
-                    assembly.GetType(SainBotSpawnControllerTypeName, false) != null);
+            ResetRegroupState(bot);
+            return false;
         }
 
-        if (sainAssembly == null)
+        try
         {
-            throw new InvalidOperationException("The loaded SAIN assembly could not be located.");
-        }
-
-        var botSpawnControllerType = sainAssembly.GetType(
-            SainBotSpawnControllerTypeName,
-            true);
-        var isExcludedMethod = botSpawnControllerType.GetMethod(
-            "IsExcluded",
-            BindingFlags.Public | BindingFlags.Static,
-            null,
-            new[] { typeof(WildSpawnType) },
-            null);
-        RequireMethod(
-            isExcludedMethod,
-            botSpawnControllerType,
-            "IsExcluded(WildSpawnType)",
-            typeof(bool));
-
-        var brainAssignmentType = sainAssembly.GetType(SainBrainAssignmentTypeName, true);
-        var toggleVanillaLayersMethod = brainAssignmentType.GetMethod(
-            "ToggleVanillaLayers",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            new[] { typeof(List<string>), typeof(List<string>), typeof(bool) },
-            null);
-        RequireMethod(
-            toggleVanillaLayersMethod,
-            brainAssignmentType,
-            "ToggleVanillaLayers(List<string>, List<string>, bool)",
-            typeof(void));
-
-        var toggleVanillaLayersForRolesMethod = brainAssignmentType.GetMethod(
-            "ToggleVanillaLayers",
-            BindingFlags.NonPublic | BindingFlags.Static,
-            null,
-            new[]
+            var context = ScourgeBotContext.Get(bot);
+            context.RefreshProtectionOnly();
+            if (context.ProtectionAnchorTerminal
+                || !context.ProtectionActive
+                || context.IsProtectionAnchor)
             {
-                typeof(List<string>),
-                typeof(List<string>),
-                typeof(List<WildSpawnType>),
-                typeof(bool)
-            },
-            null);
-        RequireMethod(
-            toggleVanillaLayersForRolesMethod,
-            brainAssignmentType,
-            "ToggleVanillaLayers(List<string>, List<string>, List<WildSpawnType>, bool)",
-            typeof(void));
+                ResetRegroupState(bot);
+                return false;
+            }
 
-        var bigBrainHandlerType = sainAssembly.GetType(SainBigBrainHandlerTypeName, true);
-        var sainLayerNamesProperty = bigBrainHandlerType.GetProperty(
-            SainLayerNamesPropertyName,
-            BindingFlags.Public | BindingFlags.Static);
-        if (sainLayerNamesProperty == null
-            || sainLayerNamesProperty.DeclaringType != bigBrainHandlerType
-            || sainLayerNamesProperty.PropertyType != typeof(List<string>)
-            || sainLayerNamesProperty.GetMethod == null
-            || !sainLayerNamesProperty.GetMethod.IsStatic)
-        {
-            throw new MissingMemberException(
-                bigBrainHandlerType.FullName,
-                SainLayerNamesPropertyName);
+            boss = context.ProtectionBoss;
+            if (ReferenceEquals(boss, null)
+                || boss.IsDead
+                || boss.Profile?.Info?.Settings == null
+                || (int)boss.Profile.Info.Settings.Role != ScourgeRoles.BossValue)
+            {
+                ResetRegroupState(bot);
+                return false;
+            }
+
+            // Protection is injected only when both sides are actively owned
+            // by SAIN. A disabled boss must not become a native SAIN leader or
+            // regroup target for a still-enabled follower.
+            if (!IsSainComponentActive(boss))
+            {
+                ResetRegroupState(bot);
+                return false;
+            }
+
+            return true;
         }
-
-        var commonVanillaLayersField = RequireStringArrayField(
-            bigBrainHandlerType,
-            CommonVanillaLayersFieldName);
-        var commonVanillaBossAndFollowerLayersField = RequireStringArrayField(
-            bigBrainHandlerType,
-            CommonVanillaBossAndFollowerLayersFieldName);
-
-        return new SainTargets(
-            isExcludedMethod,
-            toggleVanillaLayersMethod,
-            toggleVanillaLayersForRolesMethod,
-            sainLayerNamesProperty,
-            commonVanillaLayersField,
-            commonVanillaBossAndFollowerLayersField);
+        catch (Exception exception)
+        {
+            LogDebug(
+                $"[Scourge] protection anchor lookup failed for {bot.ProfileId}: {exception.Message}");
+            boss = null;
+            ResetRegroupState(bot);
+            return false;
+        }
     }
 
-    private static FallbackTargets ResolveFallbackTargets()
+    internal static bool ShouldRegroup(BotOwner bot, bool hasEnemy)
     {
-        var brainManagerType = typeof(BrainManager);
-        var brainManagerInstanceProperty = brainManagerType.GetProperty(
+        if (!IsSainComponentActive(bot))
+        {
+            ResetRegroupState(bot);
+            return false;
+        }
+
+        if (!TryGetProtectionBoss(bot, out var boss))
+        {
+            return false;
+        }
+
+        var context = ScourgeBotContext.Get(bot);
+        if (context.NativeEmergency || !IsSainComponentActive(boss))
+        {
+            ResetRegroupState(bot);
+            return false;
+        }
+
+        var state = RegroupStates.GetValue(bot, _ => new RegroupState());
+        var closeGuard = context.IsCloseProtectionGuard;
+        var anchorId = boss.ProfileId;
+        if (!string.Equals(state.AnchorId, anchorId, StringComparison.Ordinal)
+            || state.CloseGuard != closeGuard)
+        {
+            state.Reset(anchorId, closeGuard);
+        }
+
+        var distance = context.ProtectionDistance;
+        var request = ScourgeProtectionPolicy.ShouldRegroup(
+            bossAlive: !ReferenceEquals(boss, null) && !boss.IsDead,
+            isAnchor: false,
+            isCloseGuard: closeGuard,
+            // SetDecisions supplies the authoritative current enemy. The
+            // protection-only context intentionally does not refresh custom
+            // combat memory, so never let a stale HasContact suppress a
+            // no-enemy regroup request.
+            hasContact: hasEnemy,
+            protectionRevisionChanged: context.ProtectionRevisionChanged,
+            distanceToBoss: distance,
+            settings: context.ProtectionSettings);
+
+        var now = Time.time;
+        var justActivated = false;
+        var retryCooldownExpired = false;
+        if (!state.Active)
+        {
+            if (!request || now < state.RetryBlockedUntil)
+            {
+                if (now < state.RetryBlockedUntil)
+                {
+                    ResetRegroupSample(state);
+                }
+                return false;
+            }
+
+            state.Active = true;
+            state.RetryCount = 0;
+            ResetRegroupSample(state);
+            state.RetryBlockedUntil = float.NegativeInfinity;
+            justActivated = true;
+        }
+        else if (!ScourgeProtectionPolicy.ShouldMaintainRegroup(
+                     regroupActive: true,
+                     bossAlive: !ReferenceEquals(boss, null) && !boss.IsDead,
+                     isAnchor: false,
+                     isCloseGuard: closeGuard,
+                     distanceToBoss: distance,
+                     settings: context.ProtectionSettings))
+        {
+            state.Stop();
+            return false;
+        }
+
+        if (now < state.RetryBlockedUntil)
+        {
+            // Do not count stationary samples while SAIN is in the bounded
+            // retry cooldown. A retry must measure a new movement window.
+            ResetRegroupSample(state);
+            return false;
+        }
+
+        if (state.RetryBlockedUntil > float.NegativeInfinity)
+        {
+            state.RetryBlockedUntil = float.NegativeInfinity;
+            retryCooldownExpired = true;
+        }
+
+        if (justActivated)
+        {
+            SeedRegroupSample(state, distance, now);
+            return true;
+        }
+
+        if (retryCooldownExpired)
+        {
+            // The first decision after cooldown is an actual retry. Seed its
+            // sample now so later stall checks only measure this retry route.
+            SeedRegroupSample(state, distance, now);
+            return true;
+        }
+
+        if (ObserveRegroupProgress(state, distance, now))
+        {
+            state.RetryCount++;
+            ResetRegroupSample(state);
+            state.RetryBlockedUntil = now + (state.RetryCount >= RegroupRetryLimit
+                ? RegroupRetryBackoffSeconds
+                : RegroupRetryCooldownSeconds);
+            // Keep the active state so hysteresis still applies after the
+            // bounded retry cooldown; SAIN remains the movement writer.
+            return false;
+        }
+
+        return true;
+    }
+
+    internal static bool IsProtectionAnchorTerminal(BotOwner bot)
+    {
+        if (!ProtectionBridgeAvailable || ReferenceEquals(bot, null) || !IsScourge(bot))
+        {
+            return false;
+        }
+
+        try
+        {
+            var context = ScourgeBotContext.Get(bot);
+            context.RefreshProtectionOnly();
+            return context.ProtectionAnchorTerminal;
+        }
+        catch (Exception exception)
+        {
+            LogDebug(
+                $"[Scourge] protection anchor state lookup failed for {bot.ProfileId}: {exception.Message}");
+            return false;
+        }
+    }
+
+    private static void ResetRegroupState(BotOwner bot)
+    {
+        if (!ReferenceEquals(bot, null) && RegroupStates.TryGetValue(bot, out var state))
+        {
+            state.Stop();
+            state.AnchorId = null;
+        }
+    }
+
+    private static bool ObserveRegroupProgress(RegroupState state, float distance, float now)
+    {
+        var current = new ScourgeRegroupProgressState(
+            state.HasSample,
+            state.LastDistance,
+            state.LastSampleTime,
+            state.StallSamples);
+        var stalled = ScourgeProtectionPolicy.ObserveRegroupProgress(
+            current,
+            distance,
+            now,
+            out var next,
+            RegroupProgressSampleSeconds,
+            RegroupMinimumProgress,
+            RegroupStallSamplesBeforeRetry);
+        state.Progress = next;
+        state.HasSample = next.HasSample;
+        state.LastDistance = next.LastDistance;
+        state.LastSampleTime = next.LastSampleTime;
+        state.StallSamples = next.StallSamples;
+        if (!stalled)
+        {
+            // A measurable inward step clears consecutive stall retries.
+            if (state.Progress.StallSamples == 0)
+            {
+                state.RetryCount = 0;
+            }
+        }
+
+        return stalled;
+    }
+
+    private static void ResetRegroupSample(RegroupState state)
+    {
+        state.Progress = ScourgeRegroupProgressState.Empty;
+        state.HasSample = false;
+        state.LastDistance = 0f;
+        state.LastSampleTime = float.NegativeInfinity;
+        state.StallSamples = 0;
+    }
+
+    private static void SeedRegroupSample(RegroupState state, float distance, float now)
+    {
+        state.Progress = ScourgeRegroupProgressState.Empty.Seed(distance, now);
+        state.HasSample = true;
+        state.LastDistance = distance;
+        state.LastSampleTime = now;
+        state.StallSamples = 0;
+    }
+
+    private static void ResolveSainTargets()
+    {
+        _sainAssembly = Chainloader.PluginInfos[ModIdentity.SainGuid].Instance?.GetType().Assembly
+            ?? FindSainAssembly();
+        if (_sainAssembly == null)
+        {
+            throw new InvalidOperationException("SAIN assembly was not found.");
+        }
+
+        var controllerType = RequireType(SainBotSpawnControllerTypeName);
+        _botSpawnControllerInstance = RequireProperty(
+            controllerType,
             "Instance",
-            BindingFlags.NonPublic | BindingFlags.Static);
-        if (brainManagerInstanceProperty == null
-            || brainManagerInstanceProperty.DeclaringType != brainManagerType
-            || brainManagerInstanceProperty.PropertyType != brainManagerType
-            || brainManagerInstanceProperty.GetMethod == null
-            || !brainManagerInstanceProperty.GetMethod.IsStatic)
-        {
-            throw new MissingMemberException(brainManagerType.FullName, "Instance");
-        }
-
-        var activatedBotsField = brainManagerType.GetField(
-            "ActivatedBots",
-            BindingFlags.NonPublic | BindingFlags.Instance);
-        if (activatedBotsField == null
-            || activatedBotsField.DeclaringType != brainManagerType
-            || activatedBotsField.FieldType != typeof(Dictionary<IPlayer, BotOwner>))
-        {
-            throw new MissingFieldException(brainManagerType.FullName, "ActivatedBots");
-        }
-
-        var brainHelpersType = brainManagerType.Assembly.GetType(
-            BigBrainHelpersTypeName,
-            true);
-        var restoreLayerForBotMethod = brainHelpersType.GetMethod(
-            "RestoreLayerForBot",
-            BindingFlags.NonPublic | BindingFlags.Static,
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        _getSainMethod = controllerType.GetMethod(
+            "GetSAIN",
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
             null,
-            new[] { typeof(BotOwner), typeof(string) },
+            new[] { typeof(BotOwner) },
             null);
-        if (restoreLayerForBotMethod == null
-            || restoreLayerForBotMethod.DeclaringType != brainHelpersType
-            || !restoreLayerForBotMethod.IsStatic
-            || restoreLayerForBotMethod.ReturnType != typeof(void))
+        RequireMethod(_getSainMethod, "GetSAIN(BotOwner)");
+
+        var enableType = RequireType(SainEnableClassTypeName);
+        _isSainDisabledForBotMethod = enableType.GetMethod(
+            "IsSAINDisabledForBot",
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
+            null,
+            new[] { typeof(BotOwner) },
+            null);
+        RequireMethod(_isSainDisabledForBotMethod, "IsSAINDisabledForBot(BotOwner)");
+
+        var decisionType = RequireType(SainDecisionManagerTypeName);
+        _setDecisionsMethod = decisionType.GetMethods(
+                BindingFlags.NonPublic | BindingFlags.Instance)
+            .AsValueEnumerable()
+            .FirstOrDefault(method =>
+                string.Equals(method.Name, "SetDecisions", StringComparison.Ordinal)
+                && method.ReturnType == typeof(void)
+                && method.GetParameters().Length == 4);
+        if (_setDecisionsMethod == null
+            || _setDecisionsMethod.ReturnType != typeof(void)
+            || _setDecisionsMethod.GetParameters().Length != 4)
         {
-            throw new MissingMethodException(
-                brainHelpersType.FullName,
-                "RestoreLayerForBot(BotOwner, string)");
+            throw new MissingMethodException(decisionType.FullName, "SetDecisions");
         }
 
-        return new FallbackTargets(
-            brainManagerInstanceProperty,
-            activatedBotsField,
-            restoreLayerForBotMethod);
+        _squadDecisionType = _setDecisionsMethod.GetParameters()[1].ParameterType;
+        if (!string.Equals(_squadDecisionType.Name, "ESquadDecision", StringComparison.Ordinal))
+        {
+            throw new MissingMemberException(_squadDecisionType.FullName, "ESquadDecision");
+        }
+
+        _combatNone = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "None");
+        _combatSearch = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "Search");
+        _combatRushEnemy = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "RushEnemy");
+        _combatMoveToEngage = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "MoveToEngage");
+        _combatCreepOnEnemy = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "CreepOnEnemy");
+        _combatStandAndShoot = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "StandAndShoot");
+        _combatShootDistantEnemy = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "ShootDistantEnemy");
+        _combatRetreat = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "Retreat");
+        _combatRunAway = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "RunAway");
+        _combatDogFight = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "DogFight");
+        _combatAvoidGrenade = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "AvoidGrenade");
+        _combatMeleeAttack = EnumValue(_setDecisionsMethod.GetParameters()[0].ParameterType, "MeleeAttack");
+        _selfNone = EnumValue(_setDecisionsMethod.GetParameters()[2].ParameterType, "None");
+        _squadNone = EnumValue(_squadDecisionType, "None");
+        _squadRegroup = EnumValue(_squadDecisionType, "Regroup");
+        _knownSquadDecisions = new[]
+        {
+            _squadNone,
+            _squadRegroup,
+            EnumValue(_squadDecisionType, "Surround"),
+            EnumValue(_squadDecisionType, "Suppress"),
+            EnumValue(_squadDecisionType, "PushSuppressedEnemy"),
+            EnumValue(_squadDecisionType, "SpreadOut"),
+            EnumValue(_squadDecisionType, "HoldPositions"),
+            EnumValue(_squadDecisionType, "Help"),
+            EnumValue(_squadDecisionType, "Search"),
+            EnumValue(_squadDecisionType, "GroupSearch"),
+            EnumValue(_squadDecisionType, "Retreat"),
+            EnumValue(_squadDecisionType, "BoundingRetreat")
+        };
+        _squadRetreat = EnumValue(_squadDecisionType, "Retreat");
+        _squadBoundingRetreat = EnumValue(_squadDecisionType, "BoundingRetreat");
+
+        var squadType = RequireType(SainSquadContainerTypeName);
+        _leaderComponentGetter = squadType.GetProperty(
+            "LeaderComponent",
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)?.GetGetMethod(true);
+        RequireMethod(_leaderComponentGetter, "get_LeaderComponent()");
     }
 
-    private static FieldInfo RequireStringArrayField(Type declaringType, string fieldName)
+    private static Assembly FindSainAssembly()
     {
-        var field = declaringType.GetField(
-            fieldName,
-            BindingFlags.NonPublic | BindingFlags.Static);
-        if (field == null
-            || field.DeclaringType != declaringType
-            || !field.IsStatic
-            || field.FieldType != typeof(string[]))
-        {
-            throw new MissingFieldException(declaringType.FullName, fieldName);
-        }
-
-        return field;
+        return AppDomain.CurrentDomain.GetAssemblies()
+            .AsValueEnumerable()
+            .FirstOrDefault(assembly =>
+                assembly.GetType(SainBotSpawnControllerTypeName, false) != null);
     }
 
-    private static void RequireMethod(
-        MethodInfo method,
-        Type declaringType,
-        string methodName,
-        Type returnType)
+    private static Type RequireType(string fullName)
     {
-        if (method == null
-            || method.DeclaringType != declaringType
-            || !method.IsStatic
-            || method.ReturnType != returnType)
+        return _sainAssembly.GetType(fullName, true);
+    }
+
+    private static PropertyInfo RequireProperty(
+        Type type,
+        string name,
+        BindingFlags flags)
+    {
+        var property = type.GetProperty(name, flags);
+        if (property == null)
         {
-            throw new MissingMethodException(declaringType.FullName, methodName);
+            throw new MissingMemberException(type.FullName, name);
+        }
+
+        return property;
+    }
+
+    private static PropertyInfo FindProperty(Type type, string name)
+    {
+        for (var current = type; current != null; current = current.BaseType)
+        {
+            var property = current.GetProperty(
+                name,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (property != null)
+            {
+                return property;
+            }
+        }
+
+        return null;
+    }
+
+    private static void RequireMethod(MethodInfo method, string name)
+    {
+        if (method == null)
+        {
+            throw new MissingMethodException(name);
         }
     }
 
-    private static void ApplyForSuppliedScopes(
-        List<string> brainNames,
-        List<string> layerNames,
-        List<WildSpawnType> roles)
+    private static int EnumValue(Type enumType, string name)
     {
-        if (!ScourgeAiRuntime.Ready
-            || brainNames == null
-            || brainNames.Count == 0
-            || roles == null
-            || roles.Count == 0)
+        if (!enumType.IsEnum)
         {
-            return;
+            throw new InvalidOperationException($"SAIN decision type '{enumType.FullName}' is not an enum.");
         }
 
-        var selectedRoles = roles.AsValueEnumerable()
-            .Where(role => ScourgeRoles.IsScourge((int)role))
-            .Distinct()
-            .ToList();
-        if (selectedRoles.Count == 0)
+        return Convert.ToInt32(Enum.Parse(enumType, name, ignoreCase: false));
+    }
+
+    private static object GetSainComponent(BotOwner bot)
+    {
+        var controller = _botSpawnControllerInstance?.GetValue(null, null);
+        return controller == null
+            ? null
+            : _getSainMethod.Invoke(controller, new object[] { bot });
+    }
+
+    private static bool IsSainComponentActive(BotOwner bot)
+    {
+        if (!_sainInstalled || !_ownershipResolved || ReferenceEquals(bot, null))
         {
-            return;
+            return false;
         }
 
-        var scopes = BuildScopes(brainNames, selectedRoles);
         try
         {
-            ApplyScopes(scopes, layerNames);
+            if (_isSainDisabledForBotMethod != null
+                && (bool)_isSainDisabledForBotMethod.Invoke(null, new object[] { bot }))
+            {
+                return false;
+            }
+
+            return GetSainComponent(bot) != null;
         }
         catch (Exception exception)
         {
-            FailClosed(
-                "SAIN late layer repair was not safe to apply; custom tactics disabled and existing AI configuration retained",
-                exception);
+            // Bridge methods are optional. If a signature starts throwing,
+            // fail closed for protection injection rather than target a stale
+            // or unrelated SAIN component.
+            LogDebug(
+                $"[Scourge] SAIN active-component check failed for {bot.ProfileId}: {exception.Message}");
+            return false;
         }
     }
 
-    private static List<ScourgeScope> BuildScopes(
-        List<string> brainNames,
-        List<WildSpawnType> selectedRoles)
+    private static BotOwner GetBotOwner(object value)
     {
-        var scopes = new List<ScourgeScope>();
-        for (var index = 0; index < selectedRoles.Count; index++)
+        if (value == null)
         {
-            var role = selectedRoles[index];
-            if (!brainNames.AsValueEnumerable().Contains(ArenaFighterBrainName))
+            return null;
+        }
+
+        if (value is BotOwner bot)
+        {
+            return bot;
+        }
+
+        var type = value.GetType();
+        if (!OwnerProperties.TryGetValue(type, out var botOwnerProperty))
+        {
+            botOwnerProperty = FindProperty(type, "BotOwner");
+            if (botOwnerProperty != null)
             {
-                continue;
+                OwnerProperties[type] = botOwnerProperty;
             }
+        }
+        if (botOwnerProperty?.GetValue(value, null) is BotOwner direct)
+        {
+            return direct;
+        }
 
-            var scope = scopes.AsValueEnumerable()
-                .FirstOrDefault(candidate => string.Equals(
-                    candidate.BrainName,
-                    ArenaFighterBrainName,
-                    StringComparison.Ordinal));
-
-            if (scope == null)
+        if (!BotProperties.TryGetValue(type, out var botProperty))
+        {
+            botProperty = FindProperty(type, "Bot");
+            if (botProperty != null)
             {
-                scope = new ScourgeScope(ArenaFighterBrainName);
-                scopes.Add(scope);
+                BotProperties[type] = botProperty;
             }
-
-            scope.Roles.Add(role);
+        }
+        if (botProperty == null)
+        {
+            return null;
         }
 
-        return scopes;
+        var nested = botProperty.GetValue(value, null);
+        return ReferenceEquals(nested, value) ? null : GetBotOwner(nested);
     }
 
-    private static void ApplyScopes(
-        List<ScourgeScope> scopes,
-        List<string> layerNames)
+    private static int GetRole(BotOwner bot)
     {
-        if (scopes.Count == 0)
-        {
-            return;
-        }
-
-        var sainLayerNames = ReadSainLayerNames();
-        // SAIN can toggle a subset of its layers after startup. Only carry
-        // verified ArenaFighter names from a late callback into preflight;
-        // SAIN/MoreBots global names such as GroupForce are foreign scope.
-        var vanillaLayerNames = ReadNativeLayerNames();
-        if (layerNames != null)
-        {
-            vanillaLayerNames.AddRange(layerNames.AsValueEnumerable()
-                .Where(name =>
-                    IsArenaFighterNativeLayerName(name)
-                    && !sainLayerNames.AsValueEnumerable().Contains(name))
-                .Distinct()
-                .ToList());
-        }
-
-        vanillaLayerNames = vanillaLayerNames.AsValueEnumerable()
-            .Where(name => !string.IsNullOrEmpty(name))
-            .Distinct()
-            .ToList();
-
-        ApplyPlans(scopes, vanillaLayerNames, sainLayerNames);
+        return bot?.Profile?.Info?.Settings == null
+            ? -1
+            : (int)bot.Profile.Info.Settings.Role;
     }
 
-    private static void RestoreExistingScourgeExclusions()
+    private static bool IsScourge(BotOwner bot)
     {
-        var scopes = BuildScopes(
-            new List<string> { ArenaFighterBrainName },
-            ScourgeAiRuntime.Roles.AsValueEnumerable().ToList());
-        if (scopes.Count == 0)
-        {
-            return;
-        }
-
-        var sainLayerNames = ReadSainLayerNames();
-        var nativeLayerNames = ReadNativeLayerNames();
-        ApplyPlans(scopes, nativeLayerNames, sainLayerNames);
+        return ScourgeRoles.IsScourge(GetRole(bot));
     }
 
-    private static void ApplyPlans(
-        List<ScourgeScope> scopes,
-        List<string> candidateVanillaLayerNames,
-        List<string> sainLayerNames)
+    private static object GetBossSainComponent(BotOwner boss)
     {
-        // Every scope is inspected before the first BrainManager mutation. A
-        // native exclusion broad on both axes cannot be split without risking
-        // a shared role, so one unresolved scope disables the whole transaction.
-        var plans = BuildPlans(
-            scopes,
-            candidateVanillaLayerNames,
-            sainLayerNames);
-        if (plans.Count == 0)
-        {
-            return;
-        }
-
-        var transaction = new List<ScourgeLayerMutation>();
-        try
-        {
-            for (var planIndex = 0; planIndex < plans.Count; planIndex++)
-            {
-                ApplyScopedLayers(plans[planIndex], transaction);
-            }
-
-            AppliedMutations.AddRange(transaction);
-        }
-        catch
-        {
-            RollbackMutations(transaction);
-            throw;
-        }
+        return GetSainComponent(boss);
     }
 
-    private static void ApplyScopedLayers(
-        ScourgeLayerPlan plan,
-        List<ScourgeLayerMutation> transaction)
+    private sealed class SainDecisionPatch : ModulePatch
     {
-        var brains = new List<string>(1) { plan.BrainName };
-        var roles = new List<WildSpawnType>(1) { plan.Role };
-        for (var nativeIndex = 0;
-             nativeIndex < plan.NativeLayersToRestore.Count;
-             nativeIndex++)
+        private readonly MethodBase _targetMethod;
+
+        internal SainDecisionPatch(MethodBase targetMethod)
         {
-            var mutation = ScourgeLayerMutation.ForNativeRestore(
-                plan.NativeLayersToRestore[nativeIndex],
-                plan.BrainName,
-                plan.Role);
-            transaction.Add(mutation);
-            BrainManager.RestoreLayers(
-                new List<string>(1) { mutation.LayerName },
-                brains,
-                roles);
+            _targetMethod = targetMethod;
         }
 
-        for (var sainIndex = 0;
-             sainIndex < plan.SainLayersToRemove.Count;
-             sainIndex++)
+        protected override MethodBase GetTargetMethod() => _targetMethod;
+
+        [PatchPrefix]
+        private static void Prefix(object __instance, object[] __args)
         {
-            var mutation = ScourgeLayerMutation.ForSainRemoval(
-                plan.SainLayersToRemove[sainIndex],
-                plan.BrainName,
-                plan.Role);
-            var preexistingExclusions = FindExactExclusions(
-                mutation.LayerName,
-                mutation.BrainName,
-                mutation.Role);
-            transaction.Add(mutation);
             try
             {
-                BrainManager.RemoveLayers(
-                    new List<string>(1) { mutation.LayerName },
-                    brains,
-                    roles);
-            }
-            finally
-            {
-                // BigBrain inserts the global exclusion before updating live
-                // bots. Capture ownership even if a live-bot update throws.
-                mutation.CreatedExclusion = FindCreatedExclusion(
-                    mutation.LayerName,
-                    mutation.BrainName,
-                    mutation.Role,
-                    preexistingExclusions);
-            }
-        }
-    }
-
-    private static List<string> ReadSainLayerNames()
-    {
-        // The backing field is populated lazily by SAIN. Calling its public
-        // property is required so MoreBots and late preset loads are included.
-        var layerNames = _sainLayerNamesProperty?.GetValue(null, null) as List<string>;
-        return layerNames == null
-            ? new List<string>()
-            : layerNames.AsValueEnumerable()
-                .Where(name => !string.IsNullOrEmpty(name))
-                .Distinct()
-                .ToList();
-    }
-
-    private static List<string> ReadNativeLayerNames()
-    {
-        var layerNames = ArenaFighterNativeLayerNames.AsValueEnumerable().ToList();
-
-        // FightRequestLayer and PeacefulRequestLayer return a request-specific
-        // name. Include only an actual exclusion carrying one of those names;
-        // do not invent a broad prefix entry for BrainManager.
-        var exclusions = BrainManager.ExcludeLayersReadOnly;
-        if (exclusions != null)
-        {
-            layerNames.AddRange(exclusions.AsValueEnumerable()
-                .Where(exclusion => exclusion != null
-                    && IsArenaFighterNativeLayerName(exclusion.excludeLayerName))
-                .Select(exclusion => exclusion.excludeLayerName)
-                .ToList());
-        }
-
-        return layerNames.AsValueEnumerable()
-            .Where(name => !string.IsNullOrEmpty(name))
-            .Distinct()
-            .ToList();
-    }
-
-    private static bool IsArenaFighterNativeLayerName(string layerName)
-    {
-        if (string.IsNullOrEmpty(layerName))
-        {
-            return false;
-        }
-
-        return ArenaFighterNativeLayerNames.AsValueEnumerable().Contains(layerName)
-            || string.Equals(
-                layerName,
-                FightRequestLayerWithoutRequest,
-                StringComparison.Ordinal)
-            || layerName.Length > FightRequestLayerPrefix.Length
-                && layerName.StartsWith(FightRequestLayerPrefix, StringComparison.Ordinal)
-            || string.Equals(
-                layerName,
-                PeacefulRequestLayerWithoutRequest,
-                StringComparison.Ordinal)
-            || layerName.Length > PeacefulRequestLayerPrefix.Length
-                && layerName.StartsWith(PeacefulRequestLayerPrefix, StringComparison.Ordinal);
-    }
-
-    private static List<ScourgeLayerPlan> BuildPlans(
-        List<ScourgeScope> scopes,
-        List<string> candidateVanillaLayerNames,
-        List<string> sainLayerNames)
-    {
-        var plans = new List<ScourgeLayerPlan>();
-        var exclusions = BrainManager.ExcludeLayersReadOnly;
-        var nativeLayers = candidateVanillaLayerNames ?? new List<string>();
-        var saInLayers = sainLayerNames ?? new List<string>();
-
-        for (var scopeIndex = 0; scopeIndex < scopes.Count; scopeIndex++)
-        {
-            var scope = scopes[scopeIndex];
-            for (var roleIndex = 0; roleIndex < scope.Roles.Count; roleIndex++)
-            {
-                var role = scope.Roles[roleIndex];
-                var plan = new ScourgeLayerPlan(scope.BrainName, role);
-                plan.NativeLayersToRestore.AddRange(FindNativeLayersToRestore(
-                    nativeLayers,
-                    exclusions,
-                    scope.BrainName,
-                    role));
-
-                plan.SainLayersToRemove.AddRange(saInLayers.AsValueEnumerable()
-                    .Where(layerName =>
-                        !string.IsNullOrEmpty(layerName)
-                        && !HasRelevantExclusion(
-                            exclusions,
-                            layerName,
-                            scope.BrainName,
-                            role))
-                    .Distinct()
-                    .ToList());
-
-                if (plan.NativeLayersToRestore.Count > 0
-                    || plan.SainLayersToRemove.Count > 0)
+                var bot = GetBotOwner(__instance);
+                if (__args == null || __args.Length < 4 || !IsScourge(bot)
+                    || !IsSainComponentActive(bot))
                 {
-                    plans.Add(plan);
+                    return;
                 }
-            }
-        }
 
-        return plans;
-    }
+                var combat = Convert.ToInt32(__args[0]);
+                var selfAction = Convert.ToInt32(__args[2]);
+                var squad = Convert.ToInt32(__args[1]);
 
-    private static List<string> FindNativeLayersToRestore(
-        List<string> candidateLayerNames,
-        IReadOnlyList<BrainManager.ExcludeLayerInfo> exclusions,
-        string brainName,
-        WildSpawnType role)
-    {
-        var result = new List<string>();
-        if (exclusions == null || exclusions.Count == 0)
-        {
-            return result;
-        }
-
-        for (var layerIndex = 0; layerIndex < candidateLayerNames.Count; layerIndex++)
-        {
-            var layerName = candidateLayerNames[layerIndex];
-            if (string.IsNullOrEmpty(layerName))
-            {
-                continue;
-            }
-
-            var matching = exclusions.AsValueEnumerable()
-                .Where(exclusion => HasRelevantExclusion(
-                    exclusion,
-                    layerName,
-                    brainName,
-                    role))
-                .ToList();
-            if (matching.Count == 0)
-            {
-                continue;
-            }
-
-            if (!HasSafelySplittableExclusion(
-                    exclusions,
-                    layerName,
-                    brainName,
-                    role))
-            {
-                throw new InvalidOperationException(
-                    $"SAIN native exclusion '{layerName}' is broad for ArenaFighter role {(int)role}; refusing to mutate shared roles.");
-            }
-
-            result.Add(layerName);
-        }
-
-        return result;
-    }
-
-    private static bool HasSafelySplittableExclusion(
-        IReadOnlyList<BrainManager.ExcludeLayerInfo> exclusions,
-        string layerName,
-        string brainName,
-        WildSpawnType role)
-    {
-        var matchingExclusions = exclusions.AsValueEnumerable()
-            .Where(exclusion => HasRelevantExclusion(
-                exclusion,
-                layerName,
-                brainName,
-                role))
-            .ToList();
-
-        // BigBrain can split one axis at a time. A matching exclusion is safe
-        // when either the brain axis is exactly ArenaFighter (roles may be
-        // shared) or the role axis is exactly this Scourge role (brains may be
-        // shared). A null or multi-axis entry cannot be isolated safely.
-        return matchingExclusions.Count > 0
-            && !matchingExclusions.AsValueEnumerable().Any(exclusion =>
-                !IsSafelySplittableExclusion(exclusion, brainName, role));
-    }
-
-    private static bool HasRelevantExclusion(
-        IReadOnlyList<BrainManager.ExcludeLayerInfo> exclusions,
-        string layerName,
-        string brainName,
-        WildSpawnType role)
-    {
-        if (exclusions == null || exclusions.Count == 0)
-        {
-            return false;
-        }
-
-        return exclusions.AsValueEnumerable()
-            .Any(exclusion => HasRelevantExclusion(exclusion, layerName, brainName, role));
-    }
-
-    private static bool HasRelevantExclusion(
-        BrainManager.ExcludeLayerInfo exclusion,
-        string layerName,
-        string brainName,
-        WildSpawnType role)
-    {
-        if (exclusion == null
-            || !string.Equals(
-                exclusion.excludeLayerName,
-                layerName,
-                StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        return CouldContain(exclusion.ExcludeLayerBrains, brainName)
-            && CouldContain(exclusion.ExcludeLayerRoles, role);
-    }
-
-    private static bool CouldContain<T>(IReadOnlyList<T> values, T value)
-    {
-        if (values == null)
-        {
-            // Null is an unresolved wildcard in a third-party exclusion. It
-            // must be treated as relevant so compatibility fails closed.
-            return true;
-        }
-
-        return values.Count > 0 && values.AsValueEnumerable().Contains(value);
-    }
-
-    private static bool IsSafelySplittableExclusion(
-        BrainManager.ExcludeLayerInfo exclusion,
-        string brainName,
-        WildSpawnType role)
-    {
-        var brains = exclusion?.ExcludeLayerBrains;
-        var roles = exclusion?.ExcludeLayerRoles;
-        if (brains == null || roles == null || brains.Count == 0 || roles.Count == 0)
-        {
-            return false;
-        }
-
-        var exactBrain = brains.Count == 1
-            && string.Equals(brains[0], brainName, StringComparison.Ordinal);
-        var exactRole = roles.Count == 1
-            && EqualityComparer<WildSpawnType>.Default.Equals(roles[0], role);
-        return exactBrain && CouldContain(roles, role)
-            || exactRole && CouldContain(brains, brainName);
-    }
-
-    private static List<BrainManager.ExcludeLayerInfo> FindExactExclusions(
-        string layerName,
-        string brainName,
-        WildSpawnType role)
-    {
-        var exclusions = BrainManager.ExcludeLayersReadOnly;
-        if (exclusions == null)
-        {
-            return new List<BrainManager.ExcludeLayerInfo>();
-        }
-
-        return exclusions.AsValueEnumerable()
-            .Where(exclusion => IsExactExclusion(exclusion, layerName, brainName, role))
-            .ToList();
-    }
-
-    private static BrainManager.ExcludeLayerInfo FindCreatedExclusion(
-        string layerName,
-        string brainName,
-        WildSpawnType role,
-        IReadOnlyList<BrainManager.ExcludeLayerInfo> preexistingExclusions)
-    {
-        var exclusions = FindExactExclusions(layerName, brainName, role);
-        return exclusions.AsValueEnumerable()
-            .FirstOrDefault(exclusion =>
-                preexistingExclusions == null
-                || !preexistingExclusions.AsValueEnumerable().Contains(exclusion));
-    }
-
-    private static bool IsExactExclusion(
-        BrainManager.ExcludeLayerInfo exclusion,
-        string layerName,
-        string brainName,
-        WildSpawnType role)
-    {
-        return exclusion != null
-            && string.Equals(exclusion.excludeLayerName, layerName, StringComparison.Ordinal)
-            && exclusion.ExcludeLayerBrains != null
-            && exclusion.ExcludeLayerRoles != null
-            && exclusion.ExcludeLayerBrains.Count == 1
-            && exclusion.ExcludeLayerRoles.Count == 1
-            && string.Equals(
-                exclusion.ExcludeLayerBrains[0],
-                brainName,
-                StringComparison.Ordinal)
-            && EqualityComparer<WildSpawnType>.Default.Equals(
-                exclusion.ExcludeLayerRoles[0],
-                role);
-    }
-
-    private static void FailClosed(string reason, Exception exception)
-    {
-        var liveScourgeBots = CaptureLiveScourgeBots();
-        RollbackMutations(AppliedMutations);
-        AppliedMutations.Clear();
-        ScourgeAiRuntime.Disable(reason);
-        RestoreNativeLayersForBots(liveScourgeBots);
-        ScourgeClientPlugin.LogSource.LogError(
-            $"[Scourge] {reason}: {exception}");
-    }
-
-    private static List<BotOwner> CaptureLiveScourgeBots()
-    {
-        var result = new List<BotOwner>();
-        if (_brainManagerInstanceProperty == null || _activatedBotsField == null)
-        {
-            return result;
-        }
-
-        try
-        {
-            var brainManager = _brainManagerInstanceProperty.GetValue(null, null) as BrainManager;
-            var activatedBots = _activatedBotsField.GetValue(brainManager)
-                as Dictionary<IPlayer, BotOwner>;
-            if (activatedBots == null)
-            {
-                return result;
-            }
-
-            return activatedBots.Values.AsValueEnumerable()
-                .Where(bot => bot != null
-                    && !bot.IsDead
-                    && bot.Profile?.Info?.Settings != null
-                    && ScourgeRoles.IsScourge((int)bot.Profile.Info.Settings.Role))
-                .Distinct()
-                .ToList();
-        }
-        catch (Exception captureException)
-        {
-            ScourgeClientPlugin.LogSource.LogError(
-                $"[Scourge] could not snapshot live Scourge bots for native fallback: {captureException}");
-            return result;
-        }
-    }
-
-    private static void RestoreNativeLayersForBots(IReadOnlyList<BotOwner> bots)
-    {
-        if (_restoreLayerForBotMethod == null || bots == null || bots.Count == 0)
-        {
-            return;
-        }
-
-        List<string> nativeLayerNames;
-        try
-        {
-            nativeLayerNames = ReadNativeLayerNames();
-        }
-        catch (Exception readException)
-        {
-            ScourgeClientPlugin.LogSource.LogError(
-                $"[Scourge] native fallback layer list could not be read: {readException}");
-            return;
-        }
-        for (var botIndex = 0; botIndex < bots.Count; botIndex++)
-        {
-            var bot = bots[botIndex];
-            if (bot == null || bot.IsDead)
-            {
-                continue;
-            }
-
-            for (var layerIndex = 0; layerIndex < nativeLayerNames.Count; layerIndex++)
-            {
-                var layerName = nativeLayerNames[layerIndex];
-                try
+                // A terminal anchor must never allow SAIN's leader election to
+                // keep a pending Regroup route aimed at a replacement guard.
+                // Leave the original combat/self decisions unchanged.
+                if (IsProtectionAnchorTerminal(bot))
                 {
-                    _restoreLayerForBotMethod.Invoke(
-                        null,
-                        new object[] { bot, layerName });
+                    if (squad == _squadRegroup)
+                    {
+                        __args[1] = Enum.ToObject(_squadDecisionType, _squadNone);
+                    }
+
+                    ResetRegroupState(bot);
+                    return;
                 }
-                catch (Exception restoreException)
+
+                // Preserve SAIN's self action, emergency/recovery decisions,
+                // retreat decisions, and unknown values. Only ordinary combat
+                // decisions may yield to the protection route.
+                if (combat == _combatRetreat
+                    || combat == _combatRunAway
+                    || combat == _combatDogFight
+                    || combat == _combatAvoidGrenade
+                    || combat == _combatMeleeAttack)
                 {
-                    ScourgeClientPlugin.LogSource.LogError(
-                        $"[Scourge] native fallback could not restore '{layerName}' for live Scourge bot {bot.ProfileId}: {restoreException}");
+                    return;
                 }
+
+                if (!ScourgeProtectionPolicy.ShouldOverlayRegroup(
+                        combat,
+                        squad,
+                        selfAction,
+                        _selfNone,
+                        _squadRetreat,
+                        _squadBoundingRetreat,
+                        _combatNone,
+                        _combatSearch,
+                        _combatRushEnemy,
+                        _combatMoveToEngage,
+                        _combatCreepOnEnemy,
+                        _combatStandAndShoot,
+                        _combatShootDistantEnemy,
+                        _knownSquadDecisions)
+                )
+                {
+                    return;
+                }
+
+                var regroupWasActive = RegroupStates.TryGetValue(bot, out var regroupState)
+                    && regroupState.Active;
+                if (!ShouldRegroup(bot, __args[3] != null))
+                {
+                    // If this bridge previously requested the route, release
+                    // an already-selected native Regroup when hysteresis says
+                    // the follower is settled or a bounded stall cooldown is
+                    // in effect. Combat and self-action arguments remain
+                    // untouched. A SAIN-native Regroup that Scourge did not
+                    // request is left alone.
+                    if (squad == _squadRegroup
+                        && regroupWasActive
+                        && CanCancelPendingRegroup(bot))
+                    {
+                        __args[1] = Enum.ToObject(_squadDecisionType, _squadNone);
+                    }
+
+                    return;
+                }
+
+                __args[1] = Enum.ToObject(_squadDecisionType, _squadRegroup);
+            }
+            catch (Exception exception)
+            {
+                LogDebug(
+                    $"[Scourge] SAIN regroup bridge yielded: {exception.Message}");
             }
         }
     }
 
-    private static void RollbackMutations(IReadOnlyList<ScourgeLayerMutation> mutations)
+    private static bool CanCancelPendingRegroup(BotOwner bot)
     {
-        if (mutations == null)
+        if (!TryGetProtectionBoss(bot, out _))
         {
-            return;
+            return false;
         }
 
-        for (var index = mutations.Count - 1; index >= 0; index--)
+        var context = ScourgeBotContext.Get(bot);
+        return !context.NativeEmergency
+            && context.ProtectionAnchorLocked
+            && !context.ProtectionAnchorTerminal;
+    }
+
+    private sealed class SainLeaderPatch : ModulePatch
+    {
+        private readonly MethodBase _targetMethod;
+
+        internal SainLeaderPatch(MethodBase targetMethod)
         {
-            var mutation = mutations[index];
+            _targetMethod = targetMethod;
+        }
+
+        protected override MethodBase GetTargetMethod() => _targetMethod;
+
+        [PatchPostfix]
+        private static void Postfix(object __instance, ref object __result)
+        {
             try
             {
-                var brains = new List<string>(1) { mutation.BrainName };
-                var roles = new List<WildSpawnType>(1) { mutation.Role };
-                if (mutation.Kind == ScourgeLayerMutationKind.NativeRestore)
+                var follower = GetBotOwner(__instance);
+                if (!IsScourge(follower)
+                    || !IsSainComponentActive(follower)
+                    || !TryGetProtectionBoss(follower, out var boss)
+                    || !ScourgeRoles.IsScourge(GetRole(boss)))
                 {
-                    BrainManager.RemoveLayers(
-                        new List<string>(1) { mutation.LayerName },
-                        brains,
-                        roles);
+                    return;
                 }
-                else if (mutation.CreatedExclusion != null
-                    && IsOnlyMatchingExclusion(mutation))
+
+                var bossComponent = GetBossSainComponent(boss);
+                if (bossComponent != null)
                 {
-                    // The SAIN exclusion was created by this transaction. If
-                    // another owner now covers the same scope, leave it alone
-                    // instead of restoring through that foreign exclusion.
-                    BrainManager.RestoreLayers(
-                        new List<string>(1) { mutation.LayerName },
-                        brains,
-                        roles);
+                    __result = bossComponent;
                 }
             }
             catch (Exception exception)
             {
-                ScourgeClientPlugin.LogSource.LogError(
-                    $"[Scourge] SAIN compatibility rollback failed for '{mutation.LayerName}': {exception}");
+                LogDebug(
+                    $"[Scourge] SAIN leader bridge yielded: {exception.Message}");
             }
-        }
-    }
-
-    private static bool IsOnlyMatchingExclusion(ScourgeLayerMutation mutation)
-    {
-        var exclusions = BrainManager.ExcludeLayersReadOnly;
-        if (exclusions == null)
-        {
-            return false;
-        }
-
-        var matching = exclusions.AsValueEnumerable()
-            .Where(exclusion => HasRelevantExclusion(
-                exclusion,
-                mutation.LayerName,
-                mutation.BrainName,
-                mutation.Role))
-            .ToList();
-        return matching.Count == 1
-            && ReferenceEquals(matching[0], mutation.CreatedExclusion);
-    }
-
-    private static void AddReflectedLayerNames(List<string> destination, FieldInfo source)
-    {
-        var layerNames = source?.GetValue(null) as string[];
-        if (layerNames != null)
-        {
-            destination.AddRange(layerNames);
-        }
-    }
-
-    private sealed class ScourgeLayerPlan
-    {
-        internal ScourgeLayerPlan(string brainName, WildSpawnType role)
-        {
-            BrainName = brainName;
-            Role = role;
-            NativeLayersToRestore = new List<string>();
-            SainLayersToRemove = new List<string>();
-        }
-
-        internal string BrainName { get; }
-        internal WildSpawnType Role { get; }
-        internal List<string> NativeLayersToRestore { get; }
-        internal List<string> SainLayersToRemove { get; }
-    }
-
-    private enum ScourgeLayerMutationKind
-    {
-        NativeRestore,
-        SainRemoval
-    }
-
-    private sealed class ScourgeLayerMutation
-    {
-        private ScourgeLayerMutation(
-            string layerName,
-            string brainName,
-            WildSpawnType role,
-            ScourgeLayerMutationKind kind)
-        {
-            LayerName = layerName;
-            BrainName = brainName;
-            Role = role;
-            Kind = kind;
-        }
-
-        internal string LayerName { get; }
-        internal string BrainName { get; }
-        internal WildSpawnType Role { get; }
-        internal ScourgeLayerMutationKind Kind { get; }
-        internal BrainManager.ExcludeLayerInfo CreatedExclusion { get; set; }
-
-        internal static ScourgeLayerMutation ForNativeRestore(
-            string layerName,
-            string brainName,
-            WildSpawnType role) => new ScourgeLayerMutation(
-                layerName,
-                brainName,
-                role,
-                ScourgeLayerMutationKind.NativeRestore);
-
-        internal static ScourgeLayerMutation ForSainRemoval(
-            string layerName,
-            string brainName,
-            WildSpawnType role) => new ScourgeLayerMutation(
-                layerName,
-                brainName,
-                role,
-                ScourgeLayerMutationKind.SainRemoval);
-    }
-
-    private sealed class SainTargets
-    {
-        internal SainTargets(
-            MethodInfo isExcludedMethod,
-            MethodInfo toggleVanillaLayersMethod,
-            MethodInfo toggleVanillaLayersForRolesMethod,
-            PropertyInfo sainLayerNamesProperty,
-            FieldInfo commonVanillaLayersField,
-            FieldInfo commonVanillaBossAndFollowerLayersField)
-        {
-            IsExcludedMethod = isExcludedMethod;
-            ToggleVanillaLayersMethod = toggleVanillaLayersMethod;
-            ToggleVanillaLayersForRolesMethod = toggleVanillaLayersForRolesMethod;
-            SainLayerNamesProperty = sainLayerNamesProperty;
-            CommonVanillaLayersField = commonVanillaLayersField;
-            CommonVanillaBossAndFollowerLayersField = commonVanillaBossAndFollowerLayersField;
-        }
-
-        internal MethodInfo IsExcludedMethod { get; }
-        internal MethodInfo ToggleVanillaLayersMethod { get; }
-        internal MethodInfo ToggleVanillaLayersForRolesMethod { get; }
-        internal PropertyInfo SainLayerNamesProperty { get; }
-        internal FieldInfo CommonVanillaLayersField { get; }
-        internal FieldInfo CommonVanillaBossAndFollowerLayersField { get; }
-    }
-
-    private sealed class FallbackTargets
-    {
-        internal FallbackTargets(
-            PropertyInfo brainManagerInstanceProperty,
-            FieldInfo activatedBotsField,
-            MethodInfo restoreLayerForBotMethod)
-        {
-            BrainManagerInstanceProperty = brainManagerInstanceProperty;
-            ActivatedBotsField = activatedBotsField;
-            RestoreLayerForBotMethod = restoreLayerForBotMethod;
-        }
-
-        internal PropertyInfo BrainManagerInstanceProperty { get; }
-        internal FieldInfo ActivatedBotsField { get; }
-        internal MethodInfo RestoreLayerForBotMethod { get; }
-    }
-
-    private sealed class ScourgeScope
-    {
-        internal ScourgeScope(string brainName)
-        {
-            BrainName = brainName;
-            Roles = new List<WildSpawnType>();
-        }
-
-        internal string BrainName { get; }
-        internal List<WildSpawnType> Roles { get; }
-    }
-
-    private sealed class SainBotSpawnExclusionPatch : ModulePatch
-    {
-        private readonly MethodBase _targetMethod;
-
-        internal SainBotSpawnExclusionPatch(MethodBase targetMethod)
-        {
-            _targetMethod = targetMethod;
-        }
-
-        protected override MethodBase GetTargetMethod() => _targetMethod;
-
-        [PatchPostfix]
-        private static void PatchPostfix(WildSpawnType type, ref bool __result)
-        {
-            if (ScourgeAiRuntime.Ready && ScourgeRoles.IsScourge((int)type))
-            {
-                __result = true;
-            }
-        }
-    }
-
-    private sealed class SainToggleVanillaLayersPatch : ModulePatch
-    {
-        private readonly MethodBase _targetMethod;
-
-        internal SainToggleVanillaLayersPatch(MethodBase targetMethod)
-        {
-            _targetMethod = targetMethod;
-        }
-
-        protected override MethodBase GetTargetMethod() => _targetMethod;
-
-        [PatchPostfix]
-        private static void PatchPostfix(
-            List<string> brainNames,
-            List<string> layerNames,
-            bool useVanillaLayers)
-        {
-            ApplyForSuppliedScopes(
-                brainNames,
-                layerNames,
-                ScourgeAiRuntime.Roles.AsValueEnumerable().ToList());
-        }
-    }
-
-    private sealed class SainToggleVanillaLayersForRolesPatch : ModulePatch
-    {
-        private readonly MethodBase _targetMethod;
-
-        internal SainToggleVanillaLayersForRolesPatch(MethodBase targetMethod)
-        {
-            _targetMethod = targetMethod;
-        }
-
-        protected override MethodBase GetTargetMethod() => _targetMethod;
-
-        [PatchPostfix]
-        private static void PatchPostfix(
-            List<string> brainNames,
-            List<string> layerNames,
-            List<WildSpawnType> roles,
-            bool useVanillaLayers)
-        {
-            ApplyForSuppliedScopes(brainNames, layerNames, roles);
         }
     }
 }

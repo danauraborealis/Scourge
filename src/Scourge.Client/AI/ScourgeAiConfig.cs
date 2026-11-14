@@ -21,24 +21,24 @@ namespace Manimal.Scourge.Client.AI
             Enabled = config.Bind("Scourge AI", "Enabled", true,
                 "Enable Scourge squad tactics. Restart the game after changing this setting.").Value;
             ContactMemory = config.Bind("Scourge AI", "Contact memory seconds", 12f,
-                new ConfigDescription("How long soldiers search a last observed enemy position.",
+                new ConfigDescription("Standalone Scourge combat only: how long soldiers search a last observed enemy position. SAIN-controlled bots use SAIN contact memory.",
                     new AcceptableValueRange<float>(3f, 30f), AdvancedSettingTag));
             OpeningFire = config.Bind("Scourge AI", "Opening fire seconds", 2f,
-                new ConfigDescription("Time to establish covering fire before a squad member maneuvers.",
+                new ConfigDescription("Standalone Scourge combat only: time to establish covering fire before a squad member maneuvers. SAIN controls this for SAIN-owned bots.",
                     new AcceptableValueRange<float>(0.5f, 6f), AdvancedSettingTag));
             AggressionMultiplier = config.Bind("Scourge AI", "Combat aggression multiplier", DefaultAggressionMultiplier,
-                new ConfigDescription("Scales Scourge combat ranges, opening fire delay, and contact memory. 1 is the prior baseline.",
+                new ConfigDescription("Standalone Scourge combat only: scales combat ranges, opening fire delay, and contact memory. SAIN presets control SAIN-owned bots. 1 is the prior baseline.",
                     new AcceptableValueRange<float>(1f, 2f)));
             ProtectionLeashRadius = config.Bind("Scourge AI", "Protection leash radius",
                 ScourgeProtectionSettings.DefaultLeashRadius,
-                new ConfigDescription("Maximum navigation distance from the living Scourge boss.",
+                new ConfigDescription("Distance from the living Scourge boss at which guards regroup. SAIN survival actions take priority.",
                     new AcceptableValueRange<float>(18f, 60f)));
             ProtectionCloseGuardRadius = config.Bind("Scourge AI", "Close guard radius",
                 ScourgeProtectionSettings.DefaultCloseGuardRadius,
                 new ConfigDescription("Distance within which one follower maintains close protection.",
                     new AcceptableValueRange<float>(4f, 18f)));
             Debug = config.Bind("Scourge AI", "Log decisions", false,
-                new ConfigDescription("Log tactic changes and navigation failures for Scourge soldiers.",
+                new ConfigDescription("Log standalone Scourge tactic changes and navigation failures; SAIN-owned combat is logged by SAIN.",
                     null, AdvancedSettingTag));
         }
 

@@ -22,12 +22,18 @@ public sealed class ScourgeContent(
     ScourgeContainerRewardPatch containerRewardPatch,
     ISptLogger<ScourgeContent> logger)
 {
-    private static readonly MongoId[] RequiredItemIds =
+    // the two event containers, shipped in db/content/items.json.
+    private static readonly MongoId[] OwnItemIds =
+    [
+        new("6ac4e0e576842fabb501d5d0"),
+        new("6ac4eccad8aa0d51df019974"),
+    ];
+
+    // phone, precursor and quest ssd -- templates come from wtt contentbackport.
+    private static readonly MongoId[] SharedItemIds =
     [
         new("6ac4cfbc99bdd7779608792f"),
         new("6ac4d528d8aa0d51df01995c"),
-        new("6ac4e0e576842fabb501d5d0"),
-        new("6ac4eccad8aa0d51df019974"),
         new("6ac64a82d614fb7b2f0516a1"),
     ];
 
@@ -45,6 +51,15 @@ public sealed class ScourgeContent(
                 ?? throw new InvalidOperationException("[Scourge] server assembly location is unavailable."),
             "db",
             "content");
+
+        foreach (var sharedId in SharedItemIds)
+        {
+            if (!templateTable.Items.ContainsKey(sharedId))
+            {
+                throw new InvalidOperationException(
+                    $"[Scourge] event item '{sharedId}' is not installed. It ships with WTT ContentBackport {ModIdentity.WttVersion} or newer.");
+            }
+        }
 
         var items = ReadRequired<Dictionary<MongoId, TemplateItem>>(contentRoot, "items.json");
         ValidateItemSet(items);
@@ -128,8 +143,8 @@ public sealed class ScourgeContent(
 
         _loaded = true;
         logger.Info(
-            $"[Scourge] loaded {items.Count} event item templates ({addedItems.Count} added), "
-            + $"{templateTable.Handbook.Items.Count(handbook => RequiredItemIds.Contains(handbook.Id))} handbook entries, "
+            $"[Scourge] loaded {items.Count} event item templates ({addedItems.Count} added) and found {SharedItemIds.Length} from WTT ContentBackport, "
+            + $"{templateTable.Handbook.Items.Count(handbook => OwnItemIds.Contains(handbook.Id) || SharedItemIds.Contains(handbook.Id))} handbook entries, "
             + $"{containerRewards.Count} random loot container definitions, and localized names before MoreBots load.");
         return addedItems.Count;
     }
@@ -253,7 +268,7 @@ public sealed class ScourgeContent(
 
     private static void ValidateItemSet(Dictionary<MongoId, TemplateItem> items)
     {
-        foreach (var requiredId in RequiredItemIds)
+        foreach (var requiredId in OwnItemIds)
         {
             if (!items.ContainsKey(requiredId))
             {

@@ -33,6 +33,40 @@ namespace Manimal.Scourge.Client.AI
     }
 
     /// <summary>
+    /// Pure progress sample state for a native SAIN regroup route. The bridge
+    /// resets this state during cooldown and seeds a new sample when retrying,
+    /// so stationary cooldown frames cannot consume the retry budget.
+    /// </summary>
+    public readonly struct ScourgeRegroupProgressState
+    {
+        public ScourgeRegroupProgressState(
+            bool hasSample,
+            float lastDistance,
+            float lastSampleTime,
+            int stallSamples)
+        {
+            HasSample = hasSample;
+            LastDistance = lastDistance;
+            LastSampleTime = lastSampleTime;
+            StallSamples = stallSamples;
+        }
+
+        public bool HasSample { get; }
+        public float LastDistance { get; }
+        public float LastSampleTime { get; }
+        public int StallSamples { get; }
+
+        public static ScourgeRegroupProgressState Empty =>
+            new ScourgeRegroupProgressState(
+                false, 0f, float.NegativeInfinity, 0);
+
+        public ScourgeRegroupProgressState Reset() => Empty;
+
+        public ScourgeRegroupProgressState Seed(float distance, float now) =>
+            new ScourgeRegroupProgressState(true, distance, now, 0);
+    }
+
+    /// <summary>
     /// Pure protection limits shared by escort, combat, and recovery movement.
     /// Distances are supplied by the caller so this policy stays independent of
     /// Unity and can be exercised without a game runtime.
@@ -188,6 +222,127 @@ namespace Manimal.Scourge.Client.AI
             if (isCloseGuard && distanceToBoss > settings.CloseGuardRadius) return true;
             return !hasContact && protectionRevisionChanged
                 && distanceToBoss >= settings.LeashRadius * 0.75f;
+        }
+
+        /// <summary>
+        /// Identifies the ordinary SAIN combat decisions that may yield to a
+        /// protection regroup. Safety, recovery, self-action, retreat, and
+        /// unknown decisions stay untouched. Keeping this predicate pure makes
+        /// the reflection bridge's decision precedence testable without EFT.
+        /// </summary>
+        public static bool ShouldOverlayRegroup(
+            int combatDecision,
+            int squadDecision,
+            int selfAction,
+            int selfNone,
+            int squadRetreat,
+            int squadBoundingRetreat,
+            int combatNone,
+            int combatSearch,
+            int combatRushEnemy,
+            int combatMoveToEngage,
+            int combatCreepOnEnemy,
+            int combatStandAndShoot,
+            int combatShootDistantEnemy,
+            int[] knownSquadDecisions)
+        {
+            if (selfAction != selfNone
+                || squadDecision == squadRetreat
+                || squadDecision == squadBoundingRetreat
+                || knownSquadDecisions == null
+                || Array.IndexOf(knownSquadDecisions, squadDecision) < 0)
+            {
+                return false;
+            }
+
+            return combatDecision == combatNone
+                || combatDecision == combatSearch
+                || combatDecision == combatRushEnemy
+                || combatDecision == combatMoveToEngage
+                || combatDecision == combatCreepOnEnemy
+                || combatDecision == combatStandAndShoot
+                || combatDecision == combatShootDistantEnemy;
+        }
+
+        /// <summary>
+        /// Once native SAIN has started a regroup, hold it until the follower
+        /// is comfortably inside the relevant radius. This hysteresis prevents
+        /// the native decision from toggling at the 36m/close-guard boundary.
+        /// </summary>
+        public static bool ShouldMaintainRegroup(
+            bool regroupActive,
+            bool bossAlive,
+            bool isAnchor,
+            bool isCloseGuard,
+            float distanceToBoss,
+            ScourgeProtectionSettings settings)
+        {
+            if (!regroupActive || !bossAlive || isAnchor
+                || !IsFiniteNonNegative(distanceToBoss))
+            {
+                return false;
+            }
+
+            var exitRadius = (isCloseGuard
+                ? settings.CloseGuardRadius
+                : settings.LeashRadius) * 0.75f;
+            return distanceToBoss > exitRadius;
+        }
+
+        public static float RegroupExitRadius(
+            bool isCloseGuard,
+            ScourgeProtectionSettings settings)
+        {
+            return (isCloseGuard ? settings.CloseGuardRadius : settings.LeashRadius) * 0.75f;
+        }
+
+        /// <summary>
+        /// Advances one pure progress sample. It reports a stall only after a
+        /// complete sample interval without the configured inward progress.
+        /// </summary>
+        public static bool ObserveRegroupProgress(
+            ScourgeRegroupProgressState state,
+            float distance,
+            float now,
+            out ScourgeRegroupProgressState next,
+            float sampleSeconds = 1f,
+            float minimumProgress = 0.5f,
+            int stallSampleLimit = 2)
+        {
+            next = state;
+            if (!IsFiniteNonNegative(distance)
+                || !IsFiniteNonNegative(sampleSeconds)
+                || sampleSeconds <= 0f
+                || !IsFiniteNonNegative(minimumProgress)
+                || stallSampleLimit <= 0)
+            {
+                next = state.Reset();
+                return false;
+            }
+
+            if (!state.HasSample)
+            {
+                next = state.Seed(distance, now);
+                return false;
+            }
+
+            if (float.IsNaN(now) || float.IsInfinity(now)
+                || now - state.LastSampleTime < sampleSeconds)
+            {
+                return false;
+            }
+
+            var progress = state.LastDistance - distance;
+            if (progress >= minimumProgress)
+            {
+                next = state.Seed(distance, now);
+                return false;
+            }
+
+            var stalls = state.StallSamples + 1;
+            next = new ScourgeRegroupProgressState(
+                true, distance, now, stalls);
+            return stalls >= stallSampleLimit;
         }
 
         public static bool IsWithinCloseGuardRadius(

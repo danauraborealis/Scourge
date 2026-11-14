@@ -70,7 +70,7 @@ public sealed class ScourgeClientPlugin : BaseUnityPlugin
             return;
         }
 
-        Logger.LogInfo("[Scourge] Arena Fighter combat, recovery and follower escort layers are ready.");
+        Logger.LogInfo("[Scourge] squad AI ready; combat follows each bot's SAIN availability.");
     }
 
     private bool TryGetPatchedRole(string roleName, int expectedValue, out WildSpawnType role)
